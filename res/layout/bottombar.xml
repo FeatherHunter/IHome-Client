@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ihome_client.bottombar.BottomBarPanel xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:layout_width="match_parent"  
+    android:layout_height="60dp"  
+    android:layout_alignParentBottom="true"  
+    android:gravity="center_vertical"  
+    android:paddingLeft="20dp"  
+    android:paddingRight="20dp" >  
+  
+    <ihome_client.bottombar.ImageText  
+        android:id="@+id/btn_ihome"  
+        android:layout_width="wrap_content"  
+        android:layout_height="wrap_content"  
+        android:layout_alignParentLeft="true" />  
+  
+    <ihome_client.bottombar.ImageText  
+        android:id="@+id/btn_contrl"  
+        android:layout_width="wrap_content"  
+        android:layout_height="wrap_content"  
+        android:layout_toRightOf="@id/btn_ihome" />  
+  
+    <ihome_client.bottombar.ImageText  
+        android:id="@+id/btn_video"  
+        android:layout_width="wrap_content"  
+        android:layout_height="wrap_content"  
+        android:layout_toRightOf="@id/btn_contrl" />  
+  
+    <ihome_client.bottombar.ImageText  
+        android:id="@+id/btn_cservice"  
+        android:layout_width="wrap_content"  
+        android:layout_height="wrap_content"  
+        android:layout_alignParentRight="true" />  
+  
+</ihome_client.bottombar.BottomBarPanel>

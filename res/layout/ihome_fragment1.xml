@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"  
+    android:layout_height="match_parent" >  
+  
+    <Button
+           android:id="@+id/tem_hum_capacity"
+           android:layout_width="140dp"
+           android:layout_height="140dp"
+           android:layout_centerHorizontal="true"
+           android:background="@drawable/circle_shape"
+           android:padding="20dp"
+           android:layout_marginTop="400dip"
+           android:text="开启智能温控"
+           android:textColor="#00cc00"
+           android:textSize="15dp"
+           android:visibility="visible" />
+ 
+    
+</RelativeLayout>
