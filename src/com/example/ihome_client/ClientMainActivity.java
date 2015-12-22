@@ -34,6 +34,8 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 	private FragmentManager fragmentManager = null;
 	private FragmentTransaction fragmentTransaction = null;
 	FragmentIHome fragmentIHome;
+	private ServerSocket socket;
+	private String account;
 /*	private MessageFragment messageFragment;
 	private ContactsFragment contactsFragment;
 	private NewsFragment newsFragment;
@@ -44,9 +46,23 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_client_main);
+		/*初始化界面*/
 		initUI();
 		fragmentManager = getFragmentManager();
 		setDefaultFirstFragment(Constant.FRAGMENT_FLAG_IHOME);
+		/*得到mainactivity传递过来的socket*/
+		Intent intent = getIntent();
+		int mode = intent.getIntExtra("mode", 2); //得到模式信息，默认为蓝牙模式2
+		if(mode == 1)//ethnet模式
+		{
+			Toast.makeText(this, "当前处于网络模式", Toast.LENGTH_SHORT).show();
+			socket = (ServerSocket) intent.getSerializableExtra("socket");
+			account = intent.getStringExtra("account");
+		}
+		else if(mode == 2)//当前处于蓝牙模式
+		{
+			Toast.makeText(this, "当前处于蓝牙模式", Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	@Override
