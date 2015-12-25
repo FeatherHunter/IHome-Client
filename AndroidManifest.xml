@@ -27,6 +27,9 @@
         <activity
             android:name=".ClientMainActivity"
             android:label="hello" />
+		<service android:name="com.feather.socketservice.IHomeService">
+		    
+		</service>
     </application>
 
 </manifest>
