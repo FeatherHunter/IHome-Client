@@ -146,7 +146,7 @@ public class FragmentIHome extends BaseFragment{
 						}
 						else
 						{
-							operationString = new String("LEDFF");
+							operationString = new String("LEDOFF");
 						}
 					
 					}

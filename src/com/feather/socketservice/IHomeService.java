@@ -9,6 +9,7 @@ import java.security.PublicKey;
 
 import com.example.ihome_client.ClientActivity;
 import com.example.ihome_client.ClientMainActivity;
+import com.example.ihome_client.R.bool;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -246,9 +247,9 @@ public class IHomeService extends Service{
 	Runnable allInfoFlushRunnable = new Runnable() {
 
 		String RequestString;
+		boolean selectflag = true;
 		public void run() {
 			// TODO Auto-generated method stub
-			
 			while(true)
 			{
 				if(stopallthread)
@@ -265,50 +266,57 @@ public class IHomeService extends Service{
 					}
 				}
 
-			    /*请求温度*/
-				RequestString = new String("CONTRL"+seperator+account+seperator
-							+"GET"+seperator+"TEMP"+seperator);
-//				String RequestTempString = new Strng("MANAGE"+seperator+account+seperator
-//						+"LOGIN"+seperator+password+seperator);
-				byte temp_buffer[]  = RequestString.getBytes();
-
-				try {
-					outputStream.write(temp_buffer, 0, temp_buffer.length);//发送指令
-					outputStream.flush();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					isConnected = false; //断开连接
-					isAuthed = false;    //认证失效
-				}
-				while(isAuthed == false)//等待重新链接和身份认证
+				if(selectflag)
 				{
+					selectflag = !selectflag;//每次交替检查一次温度和湿度
+					/*请求温度*/
+					RequestString = new String("CONTRL"+seperator+account+seperator
+								+"GET"+seperator+"TEMP"+seperator);
+					byte temp_buffer[]  = RequestString.getBytes();
+
 					try {
-						Thread.sleep(1000);//先休眠一秒等待链接
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				/*请求湿度*/
-				RequestString = new String("CONTRL"+seperator+account+seperator
-							+"GET"+seperator+"HUMI"+seperator);
-				byte humi_buffer[] = RequestString.getBytes();
-				try {
-					outputStream.write(humi_buffer, 0, humi_buffer.length);//发送指令
-					outputStream.flush();
-				} catch (IOException e) {
+						outputStream.write(temp_buffer, 0, temp_buffer.length);//发送指令
+						outputStream.flush();
+					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 						isConnected = false; //断开连接
 						isAuthed = false;    //认证失效
+					}
+					while(isAuthed == false)//等待重新链接和身份认证
+					{
+						try {
+							Thread.sleep(1000);//先休眠一秒等待链接
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+				else {
+					selectflag = !selectflag;//每次交替检查一次温度和湿度
+					/*请求湿度*/
+					RequestString = new String("CONTRL"+seperator+account+seperator
+								+"GET"+seperator+"HUMI"+seperator);
+					byte humi_buffer[] = RequestString.getBytes();
+					try {
+						outputStream.write(humi_buffer, 0, humi_buffer.length);//发送指令
+						outputStream.flush();
+					} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							isConnected = false; //断开连接
+							isAuthed = false;    //认证失效
+					}
+					
 				}
 				try {
-					Thread.sleep(2000);      //2s获得一次
+					Thread.sleep(5000);      //2.5s获得一次
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}				
+				}
+			   				
 			}
 		}
 			

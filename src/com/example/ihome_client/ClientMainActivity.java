@@ -162,12 +162,13 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				communicationHandler.sendMessage(msgMessage);
 			}
 			/*µÆµÄ×´Ì¬*/
-			else if(typeString.equals("ledff"))
+			else if(typeString.equals("ledoff"))
 			{
 				Message msgMessage = new Message();
 				Bundle bundle = new Bundle();
 				bundle.putString("type", "ledoff");
-				bundle.putString("ledoff", intent.getStringExtra("ledoff"));
+				String ledString = intent.getStringExtra("ledoff");
+				bundle.putString("ledoff", ledString);
 				msgMessage.setData(bundle);
 				communicationHandler.sendMessage(msgMessage);
 			}
