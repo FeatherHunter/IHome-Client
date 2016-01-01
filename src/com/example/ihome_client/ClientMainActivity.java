@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.feather.socketservice.IHomeService;
+
 import ihome_client.bottombar.BaseFragment;
 import ihome_client.bottombar.BottomBarPanel;
 import ihome_client.bottombar.BottomBarPanel.BottomPanelCallback;
@@ -14,6 +16,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender.OnFinished;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -348,12 +351,26 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 			fragmentTransaction.detach(f);
 		}
 	}
+	
 
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
 		currFragTag = "";
+		
+		/*发送广播给Service，告诉他链接已经断开*/
+		Intent intent = new Intent();
+		intent.putExtra("type", "ClientMainBack");
+		intent.setAction(intent.ACTION_MAIN);
+		this.sendBroadcast(intent);
+		
+		unregisterReceiver(contrlReceiver);
+
+//		/*停止后台服务*/
+//		Intent serviceIntent = new Intent();
+//		serviceIntent.setClass(ClientMainActivity.this, IHomeService.class);
+//		stopService(serviceIntent);
 	}
 
 	@Override

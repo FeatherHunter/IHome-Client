@@ -3,6 +3,7 @@ package com.feather.socketservice;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.PublicKey;
@@ -11,6 +12,7 @@ import com.example.ihome_client.ClientActivity;
 import com.example.ihome_client.ClientMainActivity;
 import com.example.ihome_client.R.bool;
 
+import android.R.integer;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -43,7 +45,25 @@ public class IHomeService extends Service{
 	Socket serverSocket;
 	OutputStream outputStream; //ouput to server
 	InputStream inputStream;   //input from server
-	char seperator = (char) 31;//31单元分隔符
+	
+	//char COMMAND_PULSE  '0'
+	byte COMMAND_MANAGE = 1;
+	byte COMMAND_CONTRL = 2;
+	byte COMMAND_RESULT = 3;
+	byte MAN_LOGIN      = 11;
+	byte CTL_LAMP       = 21;
+	byte CTL_GET        = 22;
+	byte RES_LOGIN      = 31;
+	byte RES_LAMP       = 32;
+	byte RES_TEMP       = 33;
+	byte RES_HUMI       = 34;
+	byte LOGIN_SUCCESS  = 1;
+	byte LOGIN_FAILED   = 2;
+	byte LAMP_ON        = 1;
+	byte LAMP_OFF       = 2;
+	byte COMMAND_SEPERATOR = 31;//31单元分隔符
+	byte COMMAND_END    = 30; //30,一个指令结束
+	
 	String account, password;
 	public boolean isConnected = false;
 //	private ServiceBinder serviceBinder = new ServiceBinder();
@@ -71,9 +91,9 @@ public class IHomeService extends Service{
 		/*开启接受信息的线程*/
 		thread = new Thread(revMsgRunnable);
 		thread.start();	
-		/*开启更新数据和心跳*/
-		thread = new Thread(allInfoFlushRunnable);
-		thread.start();
+//		/*开启更新数据和心跳*/
+//		thread = new Thread(allInfoFlushRunnable);
+//		thread.start();
 		
 		/*动态注册receiver*/
 		serviceReceiver = new ServiceReceiver();
@@ -208,24 +228,52 @@ public class IHomeService extends Service{
 					intent.putExtra("disconnect", "authing");
 					sendBroadcast(intent);
 					/*用户身份验证请求*/
-					String loginRequestString = new String("MANAGE"+seperator+account+seperator
-							+"LOGIN"+seperator+password+seperator);
-					byte buffer[] = loginRequestString.getBytes();
+					String loginRequestString = new String(
+							COMMAND_MANAGE+COMMAND_SEPERATOR
+							+account+COMMAND_SEPERATOR
+							+MAN_LOGIN+COMMAND_SEPERATOR
+							+password+COMMAND_SEPERATOR
+							+COMMAND_END);
 					try {
-						outputStream.write(buffer, 0, buffer.length);
-						outputStream.flush();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						isConnected = false; //连接失败
-						isAuthed = false;    //认证失效
+						byte typeBytes[] = {COMMAND_MANAGE,COMMAND_SEPERATOR};
+						byte accountBytes[] = account.getBytes("UTF-8");//得到标准的UTF-8编码
+						byte twoBytes[] = {COMMAND_SEPERATOR,MAN_LOGIN, COMMAND_SEPERATOR};
+						byte passwordBytes[] = password.getBytes("UTF-8");
+						byte threeBytes[] = {COMMAND_SEPERATOR, COMMAND_END};
+						
+						byte buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
+						                         +passwordBytes.length+threeBytes.length];
+						int start = 0;
+						System.arraycopy(typeBytes    ,0,buffer,start, typeBytes.length);
+						start+=typeBytes.length;
+						System.arraycopy(accountBytes ,0,buffer,start, accountBytes.length);
+						start+=accountBytes.length;
+						System.arraycopy(twoBytes     ,0,buffer,start, twoBytes.length);
+						start+=twoBytes.length;
+						System.arraycopy(passwordBytes,0,buffer,start, passwordBytes.length);
+						start+=passwordBytes.length;
+						System.arraycopy(threeBytes   ,0,buffer,start, threeBytes.length);
+						
 						try {
-							Thread.sleep(2500);  //身份验证失败后等待3s
-						} catch (InterruptedException e1) {
+							outputStream.write(buffer, 0, buffer.length);
+							outputStream.flush();
+						} catch (IOException e) {
 							// TODO Auto-generated catch block
-							e1.printStackTrace();
+							e.printStackTrace();
+							isConnected = false; //连接失败
+							isAuthed = false;    //认证失效
+							try {
+								Thread.sleep(2500);  //身份验证失败后等待3s
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 						}
+					} catch (UnsupportedEncodingException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
 					}
+					
 					try {
 						Thread.sleep(1000);  //身份验证失败后等待1s
 					} catch (InterruptedException e) {
@@ -270,8 +318,11 @@ public class IHomeService extends Service{
 				{
 					selectflag = !selectflag;//每次交替检查一次温度和湿度
 					/*请求温度*/
-					RequestString = new String("CONTRL"+seperator+account+seperator
-								+"GET"+seperator+"TEMP"+seperator);
+					RequestString = new String(COMMAND_CONTRL+COMMAND_SEPERATOR
+							+account+COMMAND_SEPERATOR
+								+CTL_GET+COMMAND_SEPERATOR
+								+RES_TEMP+COMMAND_SEPERATOR
+								+COMMAND_END);
 					byte temp_buffer[]  = RequestString.getBytes();
 
 					try {
@@ -296,8 +347,11 @@ public class IHomeService extends Service{
 				else {
 					selectflag = !selectflag;//每次交替检查一次温度和湿度
 					/*请求湿度*/
-					RequestString = new String("CONTRL"+seperator+account+seperator
-								+"GET"+seperator+"HUMI"+seperator);
+					RequestString = new String(COMMAND_CONTRL+COMMAND_SEPERATOR
+							+account+COMMAND_SEPERATOR
+							+CTL_GET+COMMAND_SEPERATOR
+							+RES_HUMI+COMMAND_SEPERATOR
+							+COMMAND_END);
 					byte humi_buffer[] = RequestString.getBytes();
 					try {
 						outputStream.write(humi_buffer, 0, humi_buffer.length);//发送指令
@@ -311,7 +365,7 @@ public class IHomeService extends Service{
 					
 				}
 				try {
-					Thread.sleep(5000);      //2.5s获得一次
+					Thread.sleep(10000);      //10s获得一次
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -332,8 +386,14 @@ public class IHomeService extends Service{
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
+			int i;
 			int start;
 			int end;
+			int type;
+			String accountString;
+			int subtype;
+			int res;
+			
 			String oneString;
 			String twoString;
 			String threeString;
@@ -362,88 +422,208 @@ public class IHomeService extends Service{
 						throw new Exception("断开连接");
 					}
 					String revString = new String(buffer, 0, temp);	
-					/*得到第一个指令域*/
-					/*===注意要先判断end有没有越界，不然revString.charAt(end)可能会崩溃*/
-					for(start = 0, end = 0; (end<revString.length())&&((revString.charAt(end)!=seperator)) ; end++)
+					i = 0;
+					System.out.println("get msg from server");
+					while(i<revString.length())//可能有多组信息
 					{
-						;
-					}
-					oneString = new String(revString.substring(start, end));
-					/*得到第二个指令域*/
-					for(start = end + 1, end = end + 1; (end<revString.length())&&((revString.charAt(end)!=seperator)) ; end++)
-					{
-						;
-					}
-					twoString = new String(revString.substring(start, end));
-					/*得到第三个指令域*/
-					for(start = end + 1, end = end + 1; (end<revString.length())&&((revString.charAt(end)!=seperator)) ; end++)
-					{
-						;
-					}
-					threeString = new String(revString.substring(start, end));
-					/*得到第四个指令域*/
-					for(start = end + 1, end = end + 1; (end<revString.length())&&((revString.charAt(end)!=seperator)); end++)
-					{
-						;
-					}
-					fourString = new String(revString.substring(start, end));
-//					System.out.println(oneString + " " + twoString + " " + threeString + " " + fourString + " ");
-					
-					if(oneString.equals("RESULT"))
-					{
-						/*返回登录信息的处理*/
-						if(twoString.equals("LOGIN"))
+						/*获得指令主type*/
+						if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
 						{
-							if(threeString.equals("SUCCESS"))
+							type = revString.charAt(i);
+							i+=2;
+						}
+						else {
+							while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+							{
+								i++;
+							}
+							i++;
+							continue;
+						}
+						/*获得账户*/
+						for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=COMMAND_SEPERATOR)) ; i++,end++)
+						{
+							;
+						}
+						i++;
+						accountString = new String(revString.substring(start, end));
+						/*确定来自于自己的控制中心或者自己*/
+						if(!accountString.equals(account+"h")&&!accountString.equals(account))
+						{
+							while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+							{
+								i++;
+							}
+							i++;
+							continue;
+						}
+						/*获得指令subtype*/
+						if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+						{
+							subtype = revString.charAt(i);
+							i+=2;
+						}
+						else {
+							while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+							{
+								i++;
+							}
+							i++;
+							continue;
+						}
+						/*预处理后处理指令*/
+						if(type == COMMAND_RESULT)
+						{
+							System.out.println("COMMAND_RESULT");
+							if(subtype == RES_LOGIN)
+							{
+								System.out.println("MAN_LOGIN");
+								if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+								{
+									subtype = revString.charAt(i);
+									i+=2;
+									if(subtype == LOGIN_SUCCESS)//登陆成功
+									{
+										Intent intent = new Intent();
+										intent.setAction(intent.ACTION_ANSWER);
+							    		intent.putExtra("result", "success");
+							            sendBroadcast(intent);
+							            isAuthed = true; //身份认真成功
+							            
+							            /*身份认证成功*/
+										intent.setAction(intent.ACTION_EDIT);
+										intent.putExtra("type", "disconnect");
+										intent.putExtra("disconnect", "authed");
+										sendBroadcast(intent);
+									}
+									else 
+									{
+										Intent intent = new Intent();
+										intent.setAction(intent.ACTION_ANSWER);
+							    		intent.putExtra("result", "failed");
+							            sendBroadcast(intent);
+										isAuthed = false;    //认证失败
+									}//end of login state
+								}
+								else 
+								{
+									while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+									{
+										i++;
+									}
+									i++;
+									continue;
+								}
+							}//end of man_login
+							/*灯的状态*/
+							else if(subtype == RES_LAMP)
 							{
 								Intent intent = new Intent();
-								intent.setAction(intent.ACTION_ANSWER);
-					    		intent.putExtra("result", "success");
-					            sendBroadcast(intent);
-					            isAuthed = true; //身份认真成功
-					            
-					            /*身份认证成功*/
 								intent.setAction(intent.ACTION_EDIT);
-								intent.putExtra("type", "disconnect");
-								intent.putExtra("disconnect", "authed");
+								/*获得灯的状态*/
+								if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+								{
+									res = revString.charAt(i);
+									i+=2;
+								}
+								else {
+									/*不符合指令格式*/
+									while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+									{
+										i++;
+									}
+									i++;
+									continue;
+								}
+								if(res == LAMP_ON)
+								{
+									/*获得灯ID*/
+									if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+									{
+										res = revString.charAt(i);
+										i+=2;
+									}
+									else {
+										while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+										{
+											i++;
+										}
+										i++;
+										continue;
+									}
+									intent.putExtra("type", "ledon");
+									intent.putExtra("ledon", res+"");
+								}
+								else if(res == LAMP_OFF)
+								{
+									/*获得灯ID*/
+									if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+									{
+										res = revString.charAt(i);
+										i+=2;
+									}
+									else {
+										while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+										{
+											i++;
+										}
+										i++;
+										continue;
+									}
+									intent.putExtra("type", "ledoff");
+									intent.putExtra("ledoff", res+"");
+								}
 								sendBroadcast(intent);
 							}
-							else
+							else if(subtype == RES_TEMP)/*获取温度*/
 							{
 								Intent intent = new Intent();
-								intent.setAction(intent.ACTION_ANSWER);
-					    		intent.putExtra("result", "failed");
-					            sendBroadcast(intent);
-								isAuthed = false;    //认证失败
-							}
-						}
-						else if(twoString.equals(new String(account+"h")))
-						{
-							Intent intent = new Intent();
-							intent.setAction(intent.ACTION_EDIT);
-							if(threeString.equals("TEMP"))
-							{
+								intent.setAction(intent.ACTION_EDIT);
+								/*获得value*/
+								if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+								{
+									res = revString.charAt(i);
+									i+=2;
+								}
+								else {
+									while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+									{
+										i++;
+									}
+									i++;
+									continue;
+								}
 								intent.putExtra("type", "temp");
-								intent.putExtra("temp", fourString);
+								intent.putExtra("temp", ""+res);
+								sendBroadcast(intent);
 							}
-							else if(threeString.equals("HUMI"))
+							/*湿度*/
+							else if(subtype == RES_HUMI)
 							{
+								Intent intent = new Intent();
+								intent.setAction(intent.ACTION_EDIT);
+								/*获得value*/
+								if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+								{
+									res = revString.charAt(i);
+									i+=2;
+								}
+								else {
+									while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+									{
+										i++;
+									}
+									i++;
+									continue;
+								}
 								intent.putExtra("type", "humi");
-								intent.putExtra("humi", fourString);
+								intent.putExtra("humi", ""+res);
+								sendBroadcast(intent);
+								
 							}
-							else if(threeString.equals("LEDON"))
-							{
-								intent.putExtra("type", "ledon");
-								intent.putExtra("ledon", fourString);
-							}
-							else if(threeString.equals("LEDOFF"))
-							{
-								intent.putExtra("type", "ledoff");
-								intent.putExtra("ledoff", fourString);
-							}
-							sendBroadcast(intent);
 						}
-					}//end of result
+					
+					}
 						
 					
 				} catch (UnknownHostException e) {
@@ -483,14 +663,27 @@ public class IHomeService extends Service{
 			String typeString = intent.getStringExtra("type");
 			if(typeString.equals("send"))
 			{
-				/*需要发送的信息*/
-				String msgString = new String(intent.getStringExtra("typestring")+seperator
-						+account+seperator
-						+intent.getStringExtra("operationstring")+seperator
-						+intent.getStringExtra("numberstring")+seperator);
-				sendRunnable.sendMsg(msgString);
-				Thread thread = new Thread(sendRunnable);
-				thread.start();
+//				/*需要发送的信息*/
+//				String msgString = new String(intent.getStringExtra("typestring")+seperator
+//						+account+seperator
+//						+intent.getStringExtra("operationstring")+seperator
+//						+intent.getStringExtra("numberstring")+seperator);
+//				sendRunnable.sendMsg(msgString);
+//				Thread thread = new Thread(sendRunnable);
+//				thread.start();
+			}
+			else if(typeString.equals("ClientMainBack"))
+			{
+				/*主控界面按下了返回键，需要重新登录*/
+				isConnected = false;
+				isAuthed = false;
+				accountReady = false;
+				
+				/*通知登录activity要进行重新登录*/
+				Intent intent1 = new Intent();
+				intent1.setAction(intent1.ACTION_ANSWER);
+	    		intent1.putExtra("result", "relogin");
+	            sendBroadcast(intent1);
 			}
 		}
 		

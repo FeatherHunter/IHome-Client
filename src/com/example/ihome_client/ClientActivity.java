@@ -61,7 +61,8 @@ public class ClientActivity extends Activity {
 	private Handler handler = new Handler();
 	private AuthReceiver authReceiver;//广播接收器
 	private ProgressDialog dialog; //登录的进度条
-	private boolean firstSwitch = true;//第一次转换到ClientMainActivity，才需要刷新界面
+	private boolean firstSwitch = true;//第一次转换到ClientMainActivity，才需要刷新界面,
+									//可能同时收到多个登陆成功广播，导致多次切换
 	
 	private Intent serviceIntent; //服务Intent
 	
@@ -104,8 +105,8 @@ public class ClientActivity extends Activity {
     		/*绑定service, 利用connection建立与service的联系*/
     		serviceIntent = new Intent();
     		serviceIntent.putExtra("command", "auth");
-    		serviceIntent.putExtra("account", "975559549");
-    		serviceIntent.putExtra("password", "545538516");
+    		serviceIntent.putExtra("account", accountString);
+    		serviceIntent.putExtra("password", passwordString);
     		serviceIntent.setClass(ClientActivity.this, IHomeService.class);
     		//bindService(serviceIntent, connection, BIND_AUTO_CREATE); //绑定service,并且自动创建service
     		startService(serviceIntent); //开启服务
@@ -188,12 +189,11 @@ public class ClientActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
-			if(firstSwitch == true)
-			{
-				firstSwitch = false;
 				String resultString = intent.getStringExtra("result");
 				if(resultString.equals("success"))
 				{
+					if(firstSwitch == false) return;
+					firstSwitch = false;
 					/*切换到主控界面*/
 		    		Intent intentMain = new Intent();
 					
@@ -203,10 +203,12 @@ public class ClientActivity extends Activity {
 		            ClientActivity.this.startActivity(intentMain);
 		            
 					isAuthed = true;
-					
 					dialog.dismiss(); //登陆成功，解除进度条
 				}
 				else if (resultString.equals("falied")) {
+					if(firstSwitch == false) return;
+					firstSwitch = false;
+					
 					Toast.makeText(ClientActivity.this, "登陆失败！", Toast.LENGTH_SHORT).show();
 					/*清空输入*/
 					client_account.setText("");
@@ -214,7 +216,12 @@ public class ClientActivity extends Activity {
 					isAuthed = false;
 					dialog.dismiss(); //登陆失败，解除进度条
 				}
-			}
+				else if(resultString.equals("relogin"))
+				{
+					/*要开始重新登录*/
+					System.out.println("relogin");
+					firstSwitch = true;
+				}
 		}
 		
 		
