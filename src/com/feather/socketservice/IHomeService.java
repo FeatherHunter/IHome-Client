@@ -91,9 +91,9 @@ public class IHomeService extends Service{
 		/*开启接受信息的线程*/
 		thread = new Thread(revMsgRunnable);
 		thread.start();	
-//		/*开启更新数据和心跳*/
-//		thread = new Thread(allInfoFlushRunnable);
-//		thread.start();
+		/*开启更新数据和心跳*/
+		thread = new Thread(allInfoFlushRunnable);
+		thread.start();
 		
 		/*动态注册receiver*/
 		serviceReceiver = new ServiceReceiver();
@@ -228,21 +228,16 @@ public class IHomeService extends Service{
 					intent.putExtra("disconnect", "authing");
 					sendBroadcast(intent);
 					/*用户身份验证请求*/
-					String loginRequestString = new String(
-							COMMAND_MANAGE+COMMAND_SEPERATOR
-							+account+COMMAND_SEPERATOR
-							+MAN_LOGIN+COMMAND_SEPERATOR
-							+password+COMMAND_SEPERATOR
-							+COMMAND_END);
 					try {
+						/*需要发送的指令,byte数组*/
 						byte typeBytes[] = {COMMAND_MANAGE,COMMAND_SEPERATOR};
 						byte accountBytes[] = account.getBytes("UTF-8");//得到标准的UTF-8编码
 						byte twoBytes[] = {COMMAND_SEPERATOR,MAN_LOGIN, COMMAND_SEPERATOR};
 						byte passwordBytes[] = password.getBytes("UTF-8");
-						byte threeBytes[] = {COMMAND_SEPERATOR, COMMAND_END};
-						
+						byte threeBytes[] = {COMMAND_SEPERATOR, COMMAND_END};						
 						byte buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
-						                         +passwordBytes.length+threeBytes.length];
+						                       +passwordBytes.length+threeBytes.length];
+						
 						int start = 0;
 						System.arraycopy(typeBytes    ,0,buffer,start, typeBytes.length);
 						start+=typeBytes.length;
@@ -318,14 +313,27 @@ public class IHomeService extends Service{
 				{
 					selectflag = !selectflag;//每次交替检查一次温度和湿度
 					/*请求温度*/
-					RequestString = new String(COMMAND_CONTRL+COMMAND_SEPERATOR
-							+account+COMMAND_SEPERATOR
-								+CTL_GET+COMMAND_SEPERATOR
-								+RES_TEMP+COMMAND_SEPERATOR
-								+COMMAND_END);
-					byte temp_buffer[]  = RequestString.getBytes();
-
 					try {
+						/*需要发送的指令,byte数组*/
+						byte typeBytes[] = {COMMAND_CONTRL,COMMAND_SEPERATOR};
+						byte accountBytes[] = account.getBytes("UTF-8");//得到标准的UTF-8编码
+						byte twoBytes[] = {COMMAND_SEPERATOR,CTL_GET, COMMAND_SEPERATOR, RES_TEMP, COMMAND_SEPERATOR};
+						byte TempIDBytes[] = {1};
+						byte threeBytes[] = {COMMAND_SEPERATOR, COMMAND_END};						
+						byte temp_buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
+						                       +TempIDBytes.length+threeBytes.length];
+						/*合并到一个byte数组中*/
+						int start = 0;
+						System.arraycopy(typeBytes    ,0,temp_buffer,start, typeBytes.length);
+						start+=typeBytes.length;
+						System.arraycopy(accountBytes ,0,temp_buffer,start, accountBytes.length);
+						start+=accountBytes.length;
+						System.arraycopy(twoBytes     ,0,temp_buffer,start, twoBytes.length);
+						start+=twoBytes.length;
+						System.arraycopy(TempIDBytes,0,temp_buffer,start, TempIDBytes.length);
+						start+=TempIDBytes.length;
+						System.arraycopy(threeBytes   ,0,temp_buffer,start, threeBytes.length);
+						
 						outputStream.write(temp_buffer, 0, temp_buffer.length);//发送指令
 						outputStream.flush();
 					} catch (IOException e) {
@@ -347,13 +355,27 @@ public class IHomeService extends Service{
 				else {
 					selectflag = !selectflag;//每次交替检查一次温度和湿度
 					/*请求湿度*/
-					RequestString = new String(COMMAND_CONTRL+COMMAND_SEPERATOR
-							+account+COMMAND_SEPERATOR
-							+CTL_GET+COMMAND_SEPERATOR
-							+RES_HUMI+COMMAND_SEPERATOR
-							+COMMAND_END);
-					byte humi_buffer[] = RequestString.getBytes();
 					try {
+						/*需要发送的指令(获取湿度),byte数组*/
+						byte typeBytes[] = {COMMAND_CONTRL,COMMAND_SEPERATOR};
+						byte accountBytes[] = account.getBytes("UTF-8");//得到标准的UTF-8编码
+						byte twoBytes[] = {COMMAND_SEPERATOR,CTL_GET, COMMAND_SEPERATOR, RES_HUMI, COMMAND_SEPERATOR};
+						byte HumiIDBytes[] = {1};
+						byte threeBytes[] = {COMMAND_SEPERATOR, COMMAND_END};						
+						byte humi_buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
+						                       +HumiIDBytes.length+threeBytes.length];
+						/*合并到一个byte数组中*/
+						int start = 0;
+						System.arraycopy(typeBytes    ,0,humi_buffer,start, typeBytes.length);
+						start+=typeBytes.length;
+						System.arraycopy(accountBytes ,0,humi_buffer,start, accountBytes.length);
+						start+=accountBytes.length;
+						System.arraycopy(twoBytes     ,0,humi_buffer,start, twoBytes.length);
+						start+=twoBytes.length;
+						System.arraycopy(HumiIDBytes,0,humi_buffer,start, HumiIDBytes.length);
+						start+=HumiIDBytes.length;
+						System.arraycopy(threeBytes   ,0,humi_buffer,start, threeBytes.length);
+						
 						outputStream.write(humi_buffer, 0, humi_buffer.length);//发送指令
 						outputStream.flush();
 					} catch (IOException e) {
@@ -433,6 +455,7 @@ public class IHomeService extends Service{
 							i+=2;
 						}
 						else {
+							/*当前指令错误则跳转到下一个指令*/
 							while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
 							{
 								i++;
@@ -471,6 +494,7 @@ public class IHomeService extends Service{
 							i++;
 							continue;
 						}
+						System.out.println("type:"+type + "sub:"+subtype);
 						/*预处理后处理指令*/
 						if(type == COMMAND_RESULT)
 						{
@@ -518,6 +542,7 @@ public class IHomeService extends Service{
 							/*灯的状态*/
 							else if(subtype == RES_LAMP)
 							{
+								System.out.println("res_lamp");
 								Intent intent = new Intent();
 								intent.setAction(intent.ACTION_EDIT);
 								/*获得灯的状态*/
@@ -538,40 +563,26 @@ public class IHomeService extends Service{
 								if(res == LAMP_ON)
 								{
 									/*获得灯ID*/
-									if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+									for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=COMMAND_SEPERATOR)) ; i++,end++)
 									{
-										res = revString.charAt(i);
-										i+=2;
+										;
 									}
-									else {
-										while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
-										{
-											i++;
-										}
-										i++;
-										continue;
-									}
+									i++;
+									String IDString = new String(revString.substring(start, end));
 									intent.putExtra("type", "ledon");
-									intent.putExtra("ledon", res+"");
+									intent.putExtra("ledon", IDString);
 								}
 								else if(res == LAMP_OFF)
 								{
 									/*获得灯ID*/
-									if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+									for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=COMMAND_SEPERATOR)) ; i++,end++)
 									{
-										res = revString.charAt(i);
-										i+=2;
+										;
 									}
-									else {
-										while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
-										{
-											i++;
-										}
-										i++;
-										continue;
-									}
+									i++;
+									String IDString = new String(revString.substring(start, end));
 									intent.putExtra("type", "ledoff");
-									intent.putExtra("ledoff", res+"");
+									intent.putExtra("ledoff", IDString);
 								}
 								sendBroadcast(intent);
 							}
@@ -663,14 +674,31 @@ public class IHomeService extends Service{
 			String typeString = intent.getStringExtra("type");
 			if(typeString.equals("send"))
 			{
-//				/*需要发送的信息*/
-//				String msgString = new String(intent.getStringExtra("typestring")+seperator
-//						+account+seperator
-//						+intent.getStringExtra("operationstring")+seperator
-//						+intent.getStringExtra("numberstring")+seperator);
-//				sendRunnable.sendMsg(msgString);
-//				Thread thread = new Thread(sendRunnable);
-//				thread.start();
+				try {
+					/*接收Fragment传递来的部分指令,并添加account*/
+					byte onefield[] = intent.getByteArrayExtra("onefield");
+					byte accountfield[] = account.getBytes("UTF-8");
+					byte twofield[] = intent.getByteArrayExtra("twofield");
+					byte buffer[] = new byte[onefield.length + accountfield.length+twofield.length];
+					/*合并到一个byte数组中*/
+					int start = 0;
+					System.arraycopy(onefield    ,0,buffer,start, onefield.length);
+					start+=onefield.length;
+					System.arraycopy(accountfield ,0,buffer,start, accountfield.length);
+					start+=accountfield.length;
+					System.arraycopy(twofield     ,0,buffer,start, twofield.length);
+					
+					outputStream.write(buffer, 0, buffer.length);
+					outputStream.flush();
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					isConnected = false; //断开连接
+					isAuthed = false;    //认证失效
+				}//发送指令
 			}
 			else if(typeString.equals("ClientMainBack"))
 			{
@@ -688,38 +716,38 @@ public class IHomeService extends Service{
 		}
 		
 	}
-	SendRunnable sendRunnable = new SendRunnable();
-	/** 
-	 * @Description:
-	 * 	 用于发送信息给服务器
-	 **/
-	private class SendRunnable implements Runnable
-	{
-		String msgString;
-		public void sendMsg(String msg)
-		{
-			msgString = new String(msg);
-		}
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			byte buffer[] = msgString.getBytes();
-			if(isAuthed == true)
-			{
-				try {
-					outputStream.write(buffer, 0, buffer.length);//发送指令
-					outputStream.flush();
-				} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						isConnected = false; //断开连接
-						isAuthed = false;    //认证失效
-				}
-			}
-			
-		}
-		
-	}
+//	SendRunnable sendRunnable = new SendRunnable();
+//	/** 
+//	 * @Description:
+//	 * 	 用于发送信息给服务器
+//	 **/
+//	private class SendRunnable implements Runnable
+//	{
+//		String msgString;
+//		public void sendMsg(String msg)
+//		{
+//			msgString = new String(msg);
+//		}
+//		@Override
+//		public void run() {
+//			// TODO Auto-generated method stub
+//			byte buffer[] = msgString.getBytes();
+//			if(isAuthed == true)
+//			{
+//				try {
+//					outputStream.write(buffer, 0, buffer.length);//发送指令
+//					outputStream.flush();
+//				} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//						isConnected = false; //断开连接
+//						isAuthed = false;    //认证失效
+//				}
+//			}
+//			
+//		}
+//		
+//	}
 
 
 }
