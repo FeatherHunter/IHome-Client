@@ -44,10 +44,10 @@ public class FragmentIHome extends BaseFragment{
 	byte MAN_LOGIN      = 11;
 	byte CTL_LAMP       = 21;
 	byte CTL_GET        = 22;
-	byte RES_LOGIN      = 31;
-	byte RES_LAMP       = 32;
-	byte RES_TEMP       = 33;
-	byte RES_HUMI       = 34;
+	byte RES_LOGIN      = 32;
+	byte RES_LAMP       = 33;
+	byte RES_TEMP       = 34;
+	byte RES_HUMI       = 35;
 	byte LOGIN_SUCCESS  = 1;
 	byte LOGIN_FAILED   = 2;
 	byte LAMP_ON        = 1;
@@ -100,11 +100,19 @@ public class FragmentIHome extends BaseFragment{
 		    String typeString = bundle.getString("type");
 		    if(typeString.equals("temp"))/*设置温度*/
 			{
-		    	temp_value.setText(bundle.getString("temp"));
+		    	String IDString = bundle.getString("temp");//获取设备ID
+		    	if(IDString.equals("10000"))
+		    	{
+		    		temp_value.setText(bundle.getString("10000"));
+		    	}
 			}
 		    else if(typeString.equals("humi"))/*设置湿度*/
 			{
-		    	humi_value.setText(bundle.getString("humi"));
+		    	String IDString = bundle.getString("humi");
+		    	if(IDString.equals("10000"))
+		    	{
+		    		humi_value.setText(bundle.getString("10000"));
+		    	}
 			}
 		    else if(typeString.equals("ledon"))/*设置灯*/
 			{

@@ -53,10 +53,10 @@ public class IHomeService extends Service{
 	byte MAN_LOGIN      = 11;
 	byte CTL_LAMP       = 21;
 	byte CTL_GET        = 22;
-	byte RES_LOGIN      = 31;
-	byte RES_LAMP       = 32;
-	byte RES_TEMP       = 33;
-	byte RES_HUMI       = 34;
+	byte RES_LOGIN      = 32;
+	byte RES_LAMP       = 33;
+	byte RES_TEMP       = 34;
+	byte RES_HUMI       = 35;
 	byte LOGIN_SUCCESS  = 1;
 	byte LOGIN_FAILED   = 2;
 	byte LAMP_ON        = 1;
@@ -318,7 +318,9 @@ public class IHomeService extends Service{
 						byte typeBytes[] = {COMMAND_CONTRL,COMMAND_SEPERATOR};
 						byte accountBytes[] = account.getBytes("UTF-8");//得到标准的UTF-8编码
 						byte twoBytes[] = {COMMAND_SEPERATOR,CTL_GET, COMMAND_SEPERATOR, RES_TEMP, COMMAND_SEPERATOR};
-						byte TempIDBytes[] = {1};
+						String IDString = new String("10000");
+						byte TempIDBytes[] = IDString.getBytes("UTF-8");
+						//byte TempIDBytes[] = {'1','0'};
 						byte threeBytes[] = {COMMAND_SEPERATOR, COMMAND_END};						
 						byte temp_buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
 						                       +TempIDBytes.length+threeBytes.length];
@@ -360,7 +362,8 @@ public class IHomeService extends Service{
 						byte typeBytes[] = {COMMAND_CONTRL,COMMAND_SEPERATOR};
 						byte accountBytes[] = account.getBytes("UTF-8");//得到标准的UTF-8编码
 						byte twoBytes[] = {COMMAND_SEPERATOR,CTL_GET, COMMAND_SEPERATOR, RES_HUMI, COMMAND_SEPERATOR};
-						byte HumiIDBytes[] = {1};
+						String IDString = new String("10000");
+						byte HumiIDBytes[] = IDString.getBytes("UTF-8");						
 						byte threeBytes[] = {COMMAND_SEPERATOR, COMMAND_END};						
 						byte humi_buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
 						                       +HumiIDBytes.length+threeBytes.length];
@@ -590,6 +593,13 @@ public class IHomeService extends Service{
 							{
 								Intent intent = new Intent();
 								intent.setAction(intent.ACTION_EDIT);
+								/*获得设备ID*/
+								for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=COMMAND_SEPERATOR)) ; i++,end++)
+								{
+									;
+								}
+								i++;
+								String IDString = new String(revString.substring(start, end));
 								/*获得value*/
 								if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
 								{
@@ -605,7 +615,8 @@ public class IHomeService extends Service{
 									continue;
 								}
 								intent.putExtra("type", "temp");
-								intent.putExtra("temp", ""+res);
+								intent.putExtra("temp", IDString);//发送设备ID
+								intent.putExtra(IDString, res+"");
 								sendBroadcast(intent);
 							}
 							/*湿度*/
@@ -613,6 +624,13 @@ public class IHomeService extends Service{
 							{
 								Intent intent = new Intent();
 								intent.setAction(intent.ACTION_EDIT);
+								/*获得设备ID*/
+								for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=COMMAND_SEPERATOR)) ; i++,end++)
+								{
+									;
+								}
+								i++;
+								String IDString = new String(revString.substring(start, end));
 								/*获得value*/
 								if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
 								{
@@ -628,7 +646,8 @@ public class IHomeService extends Service{
 									continue;
 								}
 								intent.putExtra("type", "humi");
-								intent.putExtra("humi", ""+res);
+								intent.putExtra("humi", IDString);//发送设备ID
+								intent.putExtra(IDString, res+"");
 								sendBroadcast(intent);
 								
 							}

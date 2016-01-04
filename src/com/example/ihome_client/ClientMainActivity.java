@@ -139,7 +139,9 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				Message msgMessage = new Message();
 				Bundle bundle = new Bundle();
 				bundle.putString("type", "temp");
-				bundle.putString("temp", intent.getStringExtra("temp"));
+				String IDString = intent.getStringExtra("temp");
+				bundle.putString("temp", IDString);
+				bundle.putString(IDString, intent.getStringExtra(IDString));
 				msgMessage.setData(bundle);
 				communicationHandler.sendMessage(msgMessage);
 				
@@ -150,7 +152,9 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				Message msgMessage = new Message();
 				Bundle bundle = new Bundle();
 				bundle.putString("type", "humi");
-				bundle.putString("humi", intent.getStringExtra("humi"));
+				String IDString = intent.getStringExtra("humi");
+				bundle.putString("humi", IDString);
+				bundle.putString(IDString, intent.getStringExtra(IDString));
 				msgMessage.setData(bundle);
 				communicationHandler.sendMessage(msgMessage);
 			}
