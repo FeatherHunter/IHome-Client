@@ -37,23 +37,8 @@ public class FragmentIHome extends BaseFragment{
 	TextView temp_value, humi_value;
 	Button led1_button, led2_button, led3_button;
 	Button temp_button, humi_button;
-	
-	byte COMMAND_MANAGE = 1;
-	byte COMMAND_CONTRL = 2;
-	byte COMMAND_RESULT = 3;
-	byte MAN_LOGIN      = 11;
-	byte CTL_LAMP       = 21;
-	byte CTL_GET        = 22;
-	byte RES_LOGIN      = 32;
-	byte RES_LAMP       = 33;
-	byte RES_TEMP       = 34;
-	byte RES_HUMI       = 35;
-	byte LOGIN_SUCCESS  = 1;
-	byte LOGIN_FAILED   = 2;
-	byte LAMP_ON        = 1;
-	byte LAMP_OFF       = 2;
-	byte COMMAND_SEPERATOR = 31;//31单元分隔符
-	byte COMMAND_END    = 30; //30,一个指令结束
+	Button IHome_button;
+	boolean ihome_mode = false;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -73,10 +58,12 @@ public class FragmentIHome extends BaseFragment{
 		led1_button = (Button) getActivity().findViewById(R.id.led1_button);
 		led2_button = (Button) getActivity().findViewById(R.id.led2_button);
 		led3_button = (Button) getActivity().findViewById(R.id.led3_button);
+		IHome_button = (Button) getActivity().findViewById(R.id.ihome_button);
 		/*设置监听器*/
   		led1_button.setOnClickListener(new LampButtonListener());
 		led2_button.setOnClickListener(new LampButtonListener());
 		led3_button.setOnClickListener(new LampButtonListener());
+		IHome_button.setOnClickListener(new IHomeButtonListener());
 	}
 
 
@@ -98,7 +85,20 @@ public class FragmentIHome extends BaseFragment{
 			super.handleMessage(msg);
 		    Bundle bundle = msg.getData();
 		    String typeString = bundle.getString("type");
-		    if(typeString.equals("temp"))/*设置温度*/
+		    if(typeString.equals("ihome"))
+		    {
+		    	String mode = bundle.getString("ihome");
+		    	if(mode.equals("start"))
+		    	{
+		    		IHome_button.setTextColor(0xff00cc00);
+		    		ihome_mode = true;
+		    	}
+		    	else {
+		    		IHome_button.setTextColor(0xffbfbfbf);
+		    		ihome_mode = false;
+				}
+		    }
+		    else if(typeString.equals("temp"))/*设置温度*/
 			{
 		    	String IDString = bundle.getString("temp");//获取设备ID
 		    	if(IDString.equals("10000"))
@@ -137,17 +137,17 @@ public class FragmentIHome extends BaseFragment{
 		    	if( bundle.getString("ledoff").equals("0"))
 		    	{
 		    		led1_button.setText("开台灯");
-		    		led1_button.setTextColor(Color.GREEN);
+		    		led1_button.setTextColor(0xff00cc00);
 		    	}
 		    	else if( bundle.getString("ledoff").equals("1"))
 		    	{
 		    		led2_button.setText("开壁灯");
-		    		led2_button.setTextColor(Color.GREEN);
+		    		led2_button.setTextColor(0xff00cc00);
 		    	}
 		    	else if( bundle.getString("ledoff").equals("2"))
 		    	{
 		    		led3_button.setText("开吊灯");
-		    		led3_button.setTextColor(Color.GREEN);
+		    		led3_button.setTextColor(0xff00cc00);
 		    	}
 		    }
 		    
@@ -160,8 +160,8 @@ public class FragmentIHome extends BaseFragment{
 		public void onClick(View view) {
 			// TODO Auto-generated method stub
 			int lampid = view.getId();
-			byte type = COMMAND_CONTRL;
-			byte subtype = CTL_LAMP;
+			byte type = Instruction.COMMAND_CONTRL;
+			byte subtype = Instruction.CTL_LAMP;
 			byte operator = 0;
 			String IDString = new String("");;
 			switch(lampid)			{
@@ -170,11 +170,11 @@ public class FragmentIHome extends BaseFragment{
 						IDString = new String("0");
 						if(led1_button.getText().equals("开台灯"))
 						{
-							operator = LAMP_ON;
+							operator = Instruction.LAMP_ON;
 						}
 						else
 						{
-							operator = LAMP_OFF;
+							operator = Instruction.LAMP_OFF;
 						}
 					
 					}
@@ -185,11 +185,11 @@ public class FragmentIHome extends BaseFragment{
 						IDString = new String("1");
 						if(led2_button.getText().equals("开壁灯"))
 						{
-							operator = LAMP_ON;
+							operator = Instruction.LAMP_ON;
 						}
 						else
 						{
-							operator = LAMP_OFF;
+							operator = Instruction.LAMP_OFF;
 						}
 				
 					}
@@ -200,11 +200,11 @@ public class FragmentIHome extends BaseFragment{
 						IDString = new String("2");
 						if(led3_button.getText().equals("开吊灯"))
 						{
-							operator = LAMP_ON;
+							operator = Instruction.LAMP_ON;
 						}
 						else
 						{
-							operator = LAMP_OFF;
+							operator = Instruction.LAMP_OFF;
 						}
 			
 					}
@@ -213,11 +213,11 @@ public class FragmentIHome extends BaseFragment{
 			
 			try {
 				/*需要发送的指令,byte数组*/
-				byte typeBytes[] = {type,COMMAND_SEPERATOR};
-				byte subtypeBytes[] = {COMMAND_SEPERATOR,subtype, COMMAND_SEPERATOR};
-				byte operatorBytes[] = {operator, COMMAND_SEPERATOR};
+				byte typeBytes[] = {type,Instruction.COMMAND_SEPERATOR};
+				byte subtypeBytes[] = {Instruction.COMMAND_SEPERATOR,subtype, Instruction.COMMAND_SEPERATOR};
+				byte operatorBytes[] = {operator, Instruction.COMMAND_SEPERATOR};
 				byte IDBytes[] = IDString.getBytes("UTF-8");
-				byte endBytes[] = {COMMAND_SEPERATOR, COMMAND_END};						
+				byte endBytes[] = {Instruction.COMMAND_SEPERATOR, Instruction.COMMAND_END};						
 				byte buffer[] = new byte[subtypeBytes.length+operatorBytes.length
 				                       +IDBytes.length+endBytes.length];
 				
@@ -243,6 +243,45 @@ public class FragmentIHome extends BaseFragment{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		
+	}
+	
+	class IHomeButtonListener implements OnClickListener{
+
+		@Override
+		public void onClick(View view) {
+			// TODO Auto-generated method stub
+			byte operator = Instruction.IHome_STOP;
+			String IDString = new String("");
+			if(ihome_mode == false)
+			{
+				operator = Instruction.IHome_START;
+			}
+			else
+			{
+				operator = Instruction.IHome_STOP;
+			}
+			/*需要发送的指令,byte数组*/
+			byte typeBytes[] = {Instruction.COMMAND_CONTRL,Instruction.COMMAND_SEPERATOR};
+			byte subtypeBytes[] = {Instruction.COMMAND_SEPERATOR,Instruction.CTL_IHome, Instruction.COMMAND_SEPERATOR};
+			byte operatorBytes[] = {operator, Instruction.COMMAND_SEPERATOR,Instruction.COMMAND_END};						
+			byte buffer[] = new byte[subtypeBytes.length+operatorBytes.length];
+			
+			/*转换account后面所有指令*/
+			int start = 0;
+			System.arraycopy(subtypeBytes ,0,buffer,start, subtypeBytes.length);
+			start+=subtypeBytes.length;
+			System.arraycopy(operatorBytes ,0,buffer,start, operatorBytes.length);
+			
+			/*发送广播给Service，让其发送信息给服务器*/
+			Intent intent = new Intent();
+			intent.putExtra("type", "send");
+			intent.putExtra("onefield", typeBytes);
+			intent.putExtra("twofield", buffer);
+			intent.setAction(intent.ACTION_MAIN);
+			getActivity().sendBroadcast(intent);
+				
 		}
 		
 	}

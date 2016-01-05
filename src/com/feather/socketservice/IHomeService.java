@@ -10,6 +10,7 @@ import java.security.PublicKey;
 
 import com.example.ihome_client.ClientActivity;
 import com.example.ihome_client.ClientMainActivity;
+import com.example.ihome_client.Instruction;
 import com.example.ihome_client.R.bool;
 
 import android.R.integer;
@@ -45,24 +46,6 @@ public class IHomeService extends Service{
 	Socket serverSocket;
 	OutputStream outputStream; //ouput to server
 	InputStream inputStream;   //input from server
-	
-	//char COMMAND_PULSE  '0'
-	byte COMMAND_MANAGE = 1;
-	byte COMMAND_CONTRL = 2;
-	byte COMMAND_RESULT = 3;
-	byte MAN_LOGIN      = 11;
-	byte CTL_LAMP       = 21;
-	byte CTL_GET        = 22;
-	byte RES_LOGIN      = 32;
-	byte RES_LAMP       = 33;
-	byte RES_TEMP       = 34;
-	byte RES_HUMI       = 35;
-	byte LOGIN_SUCCESS  = 1;
-	byte LOGIN_FAILED   = 2;
-	byte LAMP_ON        = 1;
-	byte LAMP_OFF       = 2;
-	byte COMMAND_SEPERATOR = 31;//31单元分隔符
-	byte COMMAND_END    = 30; //30,一个指令结束
 	
 	String account, password;
 	public boolean isConnected = false;
@@ -230,11 +213,11 @@ public class IHomeService extends Service{
 					/*用户身份验证请求*/
 					try {
 						/*需要发送的指令,byte数组*/
-						byte typeBytes[] = {COMMAND_MANAGE,COMMAND_SEPERATOR};
+						byte typeBytes[] = {Instruction.COMMAND_MANAGE,Instruction.COMMAND_SEPERATOR};
 						byte accountBytes[] = account.getBytes("UTF-8");//得到标准的UTF-8编码
-						byte twoBytes[] = {COMMAND_SEPERATOR,MAN_LOGIN, COMMAND_SEPERATOR};
+						byte twoBytes[] = {Instruction.COMMAND_SEPERATOR,Instruction.MAN_LOGIN, Instruction.COMMAND_SEPERATOR};
 						byte passwordBytes[] = password.getBytes("UTF-8");
-						byte threeBytes[] = {COMMAND_SEPERATOR, COMMAND_END};						
+						byte threeBytes[] = {Instruction.COMMAND_SEPERATOR, Instruction.COMMAND_END};						
 						byte buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
 						                       +passwordBytes.length+threeBytes.length];
 						
@@ -315,13 +298,14 @@ public class IHomeService extends Service{
 					/*请求温度*/
 					try {
 						/*需要发送的指令,byte数组*/
-						byte typeBytes[] = {COMMAND_CONTRL,COMMAND_SEPERATOR};
+						byte typeBytes[] = {Instruction.COMMAND_CONTRL,Instruction.COMMAND_SEPERATOR};
 						byte accountBytes[] = account.getBytes("UTF-8");//得到标准的UTF-8编码
-						byte twoBytes[] = {COMMAND_SEPERATOR,CTL_GET, COMMAND_SEPERATOR, RES_TEMP, COMMAND_SEPERATOR};
+						byte twoBytes[] = {Instruction.COMMAND_SEPERATOR,Instruction.CTL_GET,Instruction.COMMAND_SEPERATOR, 
+								Instruction.RES_TEMP, Instruction.COMMAND_SEPERATOR};
 						String IDString = new String("10000");
 						byte TempIDBytes[] = IDString.getBytes("UTF-8");
 						//byte TempIDBytes[] = {'1','0'};
-						byte threeBytes[] = {COMMAND_SEPERATOR, COMMAND_END};						
+						byte threeBytes[] = {Instruction.COMMAND_SEPERATOR, Instruction.COMMAND_END};						
 						byte temp_buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
 						                       +TempIDBytes.length+threeBytes.length];
 						/*合并到一个byte数组中*/
@@ -359,12 +343,13 @@ public class IHomeService extends Service{
 					/*请求湿度*/
 					try {
 						/*需要发送的指令(获取湿度),byte数组*/
-						byte typeBytes[] = {COMMAND_CONTRL,COMMAND_SEPERATOR};
+						byte typeBytes[] = {Instruction.COMMAND_CONTRL,Instruction.COMMAND_SEPERATOR};
 						byte accountBytes[] = account.getBytes("UTF-8");//得到标准的UTF-8编码
-						byte twoBytes[] = {COMMAND_SEPERATOR,CTL_GET, COMMAND_SEPERATOR, RES_HUMI, COMMAND_SEPERATOR};
+						byte twoBytes[] = {Instruction.COMMAND_SEPERATOR,Instruction.CTL_GET, Instruction.COMMAND_SEPERATOR, 
+								Instruction.RES_HUMI, Instruction.COMMAND_SEPERATOR};
 						String IDString = new String("10000");
 						byte HumiIDBytes[] = IDString.getBytes("UTF-8");						
-						byte threeBytes[] = {COMMAND_SEPERATOR, COMMAND_END};						
+						byte threeBytes[] = {Instruction.COMMAND_SEPERATOR, Instruction.COMMAND_END};						
 						byte humi_buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
 						                       +HumiIDBytes.length+threeBytes.length];
 						/*合并到一个byte数组中*/
@@ -419,10 +404,6 @@ public class IHomeService extends Service{
 			int subtype;
 			int res;
 			
-			String oneString;
-			String twoString;
-			String threeString;
-			String fourString;
 			while(true)
 			{
 				if(stopallthread)
@@ -452,14 +433,14 @@ public class IHomeService extends Service{
 					while(i<revString.length())//可能有多组信息
 					{
 						/*获得指令主type*/
-						if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+						if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
 						{
 							type = revString.charAt(i);
 							i+=2;
 						}
 						else {
 							/*当前指令错误则跳转到下一个指令*/
-							while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+							while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
 							{
 								i++;
 							}
@@ -467,7 +448,7 @@ public class IHomeService extends Service{
 							continue;
 						}
 						/*获得账户*/
-						for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=COMMAND_SEPERATOR)) ; i++,end++)
+						for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 						{
 							;
 						}
@@ -476,7 +457,7 @@ public class IHomeService extends Service{
 						/*确定来自于自己的控制中心或者自己*/
 						if(!accountString.equals(account+"h")&&!accountString.equals(account))
 						{
-							while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+							while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
 							{
 								i++;
 							}
@@ -484,13 +465,13 @@ public class IHomeService extends Service{
 							continue;
 						}
 						/*获得指令subtype*/
-						if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+						if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
 						{
 							subtype = revString.charAt(i);
 							i+=2;
 						}
 						else {
-							while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+							while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
 							{
 								i++;
 							}
@@ -499,17 +480,41 @@ public class IHomeService extends Service{
 						}
 						System.out.println("type:"+type + "sub:"+subtype);
 						/*预处理后处理指令*/
-						if(type == COMMAND_RESULT)
+						if(type == Instruction.COMMAND_RESULT)
 						{
 							System.out.println("COMMAND_RESULT");
-							if(subtype == RES_LOGIN)
+							/*---------------rev res_ihome----------*/
+							if(subtype == Instruction.RES_IHome)
 							{
-								System.out.println("MAN_LOGIN");
-								if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+								if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
 								{
 									subtype = revString.charAt(i);
 									i+=2;
-									if(subtype == LOGIN_SUCCESS)//登陆成功
+								}
+								Intent intent = new Intent();
+								intent.setAction(intent.ACTION_EDIT);
+								if(subtype == Instruction.IHome_START)
+								{
+									/*返回ihome模式开启情况*/
+									intent.putExtra("type", "ihome");
+									intent.putExtra("ihome", "start");
+									sendBroadcast(intent);
+								}
+								else if(subtype == Instruction.IHome_STOP){
+									/*返回ihome模式开启情况*/
+									intent.putExtra("type", "ihome");
+									intent.putExtra("ihome", "stop");
+									sendBroadcast(intent);
+								}
+							}//end of res_ihome
+							else if(subtype == Instruction.RES_LOGIN)
+							{
+								System.out.println("MAN_LOGIN");
+								if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
+								{
+									subtype = revString.charAt(i);
+									i+=2;
+									if(subtype == Instruction.LOGIN_SUCCESS)//登陆成功
 									{
 										Intent intent = new Intent();
 										intent.setAction(intent.ACTION_ANSWER);
@@ -534,7 +539,7 @@ public class IHomeService extends Service{
 								}
 								else 
 								{
-									while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+									while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
 									{
 										i++;
 									}
@@ -543,30 +548,30 @@ public class IHomeService extends Service{
 								}
 							}//end of man_login
 							/*灯的状态*/
-							else if(subtype == RES_LAMP)
+							else if(subtype == Instruction.RES_LAMP)
 							{
 								System.out.println("res_lamp");
 								Intent intent = new Intent();
 								intent.setAction(intent.ACTION_EDIT);
 								/*获得灯的状态*/
-								if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+								if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
 								{
 									res = revString.charAt(i);
 									i+=2;
 								}
 								else {
 									/*不符合指令格式*/
-									while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+									while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
 									{
 										i++;
 									}
 									i++;
 									continue;
 								}
-								if(res == LAMP_ON)
+								if(res == Instruction.LAMP_ON)
 								{
 									/*获得灯ID*/
-									for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=COMMAND_SEPERATOR)) ; i++,end++)
+									for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 									{
 										;
 									}
@@ -575,10 +580,10 @@ public class IHomeService extends Service{
 									intent.putExtra("type", "ledon");
 									intent.putExtra("ledon", IDString);
 								}
-								else if(res == LAMP_OFF)
+								else if(res == Instruction.LAMP_OFF)
 								{
 									/*获得灯ID*/
-									for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=COMMAND_SEPERATOR)) ; i++,end++)
+									for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 									{
 										;
 									}
@@ -589,25 +594,25 @@ public class IHomeService extends Service{
 								}
 								sendBroadcast(intent);
 							}
-							else if(subtype == RES_TEMP)/*获取温度*/
+							else if(subtype == Instruction.RES_TEMP)/*获取温度*/
 							{
 								Intent intent = new Intent();
 								intent.setAction(intent.ACTION_EDIT);
 								/*获得设备ID*/
-								for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=COMMAND_SEPERATOR)) ; i++,end++)
+								for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 								{
 									;
 								}
 								i++;
 								String IDString = new String(revString.substring(start, end));
 								/*获得value*/
-								if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+								if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
 								{
 									res = revString.charAt(i);
 									i+=2;
 								}
 								else {
-									while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+									while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
 									{
 										i++;
 									}
@@ -620,25 +625,25 @@ public class IHomeService extends Service{
 								sendBroadcast(intent);
 							}
 							/*湿度*/
-							else if(subtype == RES_HUMI)
+							else if(subtype == Instruction.RES_HUMI)
 							{
 								Intent intent = new Intent();
 								intent.setAction(intent.ACTION_EDIT);
 								/*获得设备ID*/
-								for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=COMMAND_SEPERATOR)) ; i++,end++)
+								for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 								{
 									;
 								}
 								i++;
 								String IDString = new String(revString.substring(start, end));
 								/*获得value*/
-								if((i + 1 <revString.length())&&(revString.charAt(i+1)==COMMAND_SEPERATOR))
+								if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
 								{
 									res = revString.charAt(i);
 									i+=2;
 								}
 								else {
-									while((i<revString.length())&&(revString.charAt(i))!=COMMAND_END)
+									while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
 									{
 										i++;
 									}

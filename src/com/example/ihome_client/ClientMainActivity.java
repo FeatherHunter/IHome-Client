@@ -134,10 +134,10 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
 			String typeString = intent.getStringExtra("type");
+			Message msgMessage = new Message();
+			Bundle bundle = new Bundle();
 			if(typeString.equals("temp"))/*发送给第一个ihome fragment*/
 			{
-				Message msgMessage = new Message();
-				Bundle bundle = new Bundle();
 				bundle.putString("type", "temp");
 				String IDString = intent.getStringExtra("temp");
 				bundle.putString("temp", IDString);
@@ -149,8 +149,6 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 			/*更新温度信息*/
 			else if(typeString.equals("humi"))
 			{
-				Message msgMessage = new Message();
-				Bundle bundle = new Bundle();
 				bundle.putString("type", "humi");
 				String IDString = intent.getStringExtra("humi");
 				bundle.putString("humi", IDString);
@@ -161,8 +159,6 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 			/*灯的状态*/
 			else if(typeString.equals("ledon"))
 			{
-				Message msgMessage = new Message();
-				Bundle bundle = new Bundle();
 				bundle.putString("type", "ledon");
 				bundle.putString("ledon", intent.getStringExtra("ledon"));
 				msgMessage.setData(bundle);
@@ -171,8 +167,6 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 			/*灯的状态*/
 			else if(typeString.equals("ledoff"))
 			{
-				Message msgMessage = new Message();
-				Bundle bundle = new Bundle();
 				bundle.putString("type", "ledoff");
 				String ledString = intent.getStringExtra("ledoff");
 				bundle.putString("ledoff", ledString);
@@ -199,6 +193,16 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				{
 					Toast.makeText(ClientMainActivity.this, "认证成功", Toast.LENGTH_SHORT).show();
 				}
+			}
+			/*发送IHome mode开启状况*/
+			else if(typeString.equals("ihome"))
+			{
+				bundle.putString("type", "ihome");
+				String modeString = intent.getStringExtra("ihome");
+				bundle.putString("ihome", modeString);
+				msgMessage.setData(bundle);
+				communicationHandler.sendMessage(msgMessage);
+				Toast.makeText(ClientMainActivity.this, modeString, Toast.LENGTH_SHORT).show();
 			}
 
 		}
