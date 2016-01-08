@@ -1,50 +1,45 @@
 package com.example.ihome_client;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
-import com.feather.socketservice.IHomeService;
-
 import ihome_client.bottombar.BottomBarPanel;
-import ihome_client.bottombar.BottomBarPanel;
-import ihome_client.bottombar.Constant;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.R.integer;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.location.GpsStatus.Listener;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import ihome_client.*;
+import com.feather.socketservice.IHomeService;
+
+/** 
+ * @CopyRight: 王辰浩 2015~2025
+ * @Author Feather Hunter(猎羽)
+ * @qq:975559549
+ * @Version: 1.0 
+ * @Date:2015/12/25
+ * @Description: 登陆界面,用于输入账号密码后启动后台Service进行身份认证登录。
+ *        详细项目介绍：
+ *        1.onCreate设置好各个组件
+ *        2.监听到登陆按键后，启动后台Service和Receiver，在登陆成功后跳转到ClientMainActivity的主控界面
+ *       
+ * @Function List:
+ *      1. void onCreate 					//初始化组件，并且准备dialog
+ *      2. LoginButtonListener  			//监听登录建，动态注册Receiver，并且启动后台Service服务
+ *      3. Runnable loginOvertimeRunnable 	//用于连接超时时候关闭dialog
+ *      4. AuthReceiver         			//接收广播，处理登陆成功和登录失败的情况。
+ *      5. void onDestroy()     			//解除Receiver，并且关闭后台服务
+ * @history:
+ *    v1.0 完成基础登录的功能
+ **/
 
 public class ClientActivity extends Activity {
 
@@ -68,26 +63,44 @@ public class ClientActivity extends Activity {
 	
 	//IHomeService.ServiceBinder serviceBinder;//IHomeService中的binder
 	
+	/**
+	 *  @Function:void onCreate
+	 *  @author:Feather Hunter
+	 *  @Description:
+	 *  	获得各个组件ID，并且初始化dialog（用于登录）
+	 *  @calls:
+	 *     1. new LoginButtonListener(); //登录键监听
+	 *  @Input:
+	 *  @Return:
+	 */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);  	
 		
-        logoImageView = (ImageView) findViewById(R.id.ihome_logo);
-        client_account = (EditText) findViewById(R.id.client_account);
-        client_password = (EditText) findViewById(R.id.client_password);
-        client_login = (Button) findViewById(R.id.client_login);
-        client_bluetooth = (Button) findViewById(R.id.client_bluetooth);
-        client_login.setOnClickListener(new LoginButtonListener());
-        client_bluetooth.setOnClickListener(new BluetoothButtonListener());
-        
-        /* connect server */
+		logoImageView = (ImageView) findViewById(R.id.ihome_logo);
+		client_account = (EditText) findViewById(R.id.client_account);
+		client_password = (EditText) findViewById(R.id.client_password);
+		client_login = (Button) findViewById(R.id.client_login);
+		client_bluetooth = (Button) findViewById(R.id.client_bluetooth);
+		client_login.setOnClickListener(new LoginButtonListener());
+		client_bluetooth.setOnClickListener(new BluetoothButtonListener());
+
+		/* connect server */
 		dialog = new ProgressDialog(this);
 		dialog.setTitle("提示");
 		dialog.setMessage("正在登录中...");
 		dialog.setCancelable(false);
-        
-    }
+
+	}
+    /**
+	 *  @Class:LoginButtonListener
+	 *  @author:Feather Hunter
+	 *  @Description:
+	 *  	登录按键监听，动态注册authReceiver用于接受后台Service发送的广播
+	 *  	启动了Service并且显示了dialog，开启了超市倒计时计数器。在一定时间
+	 *  	内未登录成功，会提示失败。
+	 */
     class LoginButtonListener implements OnClickListener
     {
 
@@ -129,14 +142,19 @@ public class ClientActivity extends Activity {
             ClientActivity.this.startActivity(intent);
     	}	
     }
-    /*超过10S还没有连接成功，则一定失败了*/
+    
+    /**
+	 *  @Object: loginOvertimeRunnable
+	 *  @Description:
+	 *  	启动登陆后的计时功能，在一定时间内没有连接成功则一定失败了
+	 */
     Runnable loginOvertimeRunnable = new Runnable() {
 		
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
 			try {
-				Thread.sleep(10000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -162,25 +180,12 @@ public class ClientActivity extends Activity {
 			
 		}
 	};
-//    /*用于service和activity之间通信，直接调用IHomeService之中ServiceBinder的方法来与service通信*/
-//    private ServiceConnection connection = new ServiceConnection() {
-//		
-//		@Override
-//		public void onServiceDisconnected(ComponentName name) {
-//			// TODO Auto-generated method stub
-//			
-//		}
-//		
-//		@Override
-//		public void onServiceConnected(ComponentName name, IBinder service) {
-//			// TODO Auto-generated method stub
-//			serviceBinder = (ServiceBinder) service;
-//			//serviceBinder.auth(accountString, passwordString);
-//			
-//		}
-//		
-//	};
 	
+	/**
+	 *  @Class: AuthReceiver
+	 *  @Description:
+	 *  	若登陆成功,发送登录模式给ClientMainActivity,并且切换到ClientMainActivity
+	 */
 	private class AuthReceiver extends BroadcastReceiver{
 
 		public AuthReceiver() {
@@ -223,10 +228,9 @@ public class ClientActivity extends Activity {
 					firstSwitch = true;
 				}
 		}
-		
-		
 	}
 
+	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
     	menu.add(0, 0, 0, "退出");
@@ -257,5 +261,4 @@ public class ClientActivity extends Activity {
     
     
 }
-
 

@@ -22,6 +22,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,23 +42,32 @@ import ihome_client.*;
  * @CopyRight: 王辰浩 2015~2025
  * @Author Feather Hunter(猎羽)
  * @qq:975559549
- * @Version:1.0 
+ * @Version:2.10 
  * @Date:2015/12/25
- * @Description: 登陆之后的控制主界面。用于几个页面碎片(fragment)的切换。
- *              并且与后台Service进行交互，来完成各种控制功能。
+ * @Description: 登陆之后的控制主界面。用于几个页面碎片(fragment)的切换。并且与后台Service进行交互，来完成各种控制功能。
+ *        详细项目介绍：
+ *        1.onCreate初始化了UI界面，动态注册了广播接收器用于接受后台Service发来的信息
+ *        2.通过底部的按钮,切换几个fragment(页面)
+ *        3.如果按下了返回键，会调用onKeyDown函数进行处理：解除注册的Receiver和发送“连接中断”给Service。并且返回到ClientActivity
+ *        4.Receiver等待Service的广播，并将处理的结果通过setHandler发送给FragmentIHome进行相应的显示。
+ *        5.如下方法列表中4~10用于切换多个Fragment
+ *       
  * @Function List:
  *      1. void onCreate 		//判断当前的工作模式,动态注册广播接收器
  *      2. class ContrlReceiver //接收器,更新温度等数据信息,显示连接和认证信息
  *      3. void initUI() 		//初始化界面
  *      4. void setTabSelection //开启一个Fragment事务,并切换Fragment
  *      5. void switchFragment  //切换Fragment
- *      6. void attachFragment  //
- *      7. void commitTransactions //
+ *      6. void attachFragment  
+ *      7. void commitTransactions 
  *      8. void setDefaultFirstFragment
  *      9. FragmentTransaction ensureTransaction
  *      10.Fragment getFragment
  *      11.void detachFragment(Fragment f)
  *      12.void setHandler(Handler handler); //用于和FragmentIHome通信
+ *      13.public boolean onKeyDown(int keyCode, KeyEvent event); //用于处理返回键等按下后的时间
+ * @history:
+ *    v2.10 2016/1/8 解决了手机待机导致程序崩溃BUG，解决了反复在登陆界面和控制界面切换导致控制界面显示出错BUG
  **/
 
 public class ClientMainActivity extends Activity implements BottomPanelCallback {
@@ -98,6 +108,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_client_main);
 		/*初始化界面*/
+		currFragTag = "";
 		initUI();
 		fragmentManager = getFragmentManager();
 		setDefaultFirstFragment(Constant.FRAGMENT_FLAG_IHOME);
@@ -114,12 +125,46 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		{
 			Toast.makeText(this, "当前处于蓝牙模式", Toast.LENGTH_SHORT).show();
 		}
-		/*动态注册receiver*/
+		try {
+			/*动态注册receiver*/
+			contrlReceiver = new ContrlReceiver();
+			IntentFilter filter = new IntentFilter();
+			filter.addAction(CONTRL_ACTION);
+			registerReceiver(contrlReceiver, filter);//注册 
+		} catch (IllegalArgumentException  e) {
+			// TODO: handle exception
+			System.out.println("had been registerReceiver");
+		}
+		/*默认开启IHome界面*/
+		//onBottomPanelClick(Constant.BTN_FLAG_IHOME);
+		System.out.println("onCreate");
+	}
+	
+	@Override
+	protected void onRestart() {
+		// TODO Auto-generated method stub
+		super.onRestart();
+		
 		contrlReceiver = new ContrlReceiver();
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(CONTRL_ACTION);
-		registerReceiver(contrlReceiver, filter);//注册
+		registerReceiver(contrlReceiver, filter);//注册 
+
+		System.out.println("onRestart");
 	}
+
+	protected void onStart(){
+		super.onStart();
+		System.out.println("onStart");
+	}
+	
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		System.out.println("onPause");
+	}
+
 	/*设置*/
 	public void setHandler(Handler handler)
 	{
@@ -230,7 +275,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		*/
 	}
 
-	/* 处理BottomControlPanel的回调
+	/** 处理BottomControlPanel的回调
 	 * @see org.yanzi.ui.BottomControlPanel.BottomPanelCallback#onBottomPanelClick(int)
 	 */
 	@Override
@@ -360,25 +405,44 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		}
 	}
 	
+	
+	/**
+	 *  @author: feather
+	 *  @description: 判断是否按下返回键，如果按下则进行相应处理
+	 **/
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO Auto-generated method stub
+		if(keyCode == KeyEvent.KEYCODE_BACK) //按下返回键
+		{
+			Intent intent = new Intent();
+			intent.putExtra("type", "ClientMainBack");
+			intent.setAction(intent.ACTION_MAIN);
+			this.sendBroadcast(intent);
+			
+			unregisterReceiver(contrlReceiver);//解除注册的Receiver
+			
+			boolean res =super.onKeyDown(keyCode, event);
+			//this.onDestory();
+			return res;
+		}
+		else {
+			return super.onKeyDown(keyCode, event);
+		}
+	}
 
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
-		currFragTag = "";
-		
-		/*发送广播给Service，告诉他链接已经断开*/
-		Intent intent = new Intent();
-		intent.putExtra("type", "ClientMainBack");
-		intent.setAction(intent.ACTION_MAIN);
-		this.sendBroadcast(intent);
-		
-		unregisterReceiver(contrlReceiver);
 
-//		/*停止后台服务*/
-//		Intent serviceIntent = new Intent();
-//		serviceIntent.setClass(ClientMainActivity.this, IHomeService.class);
-//		stopService(serviceIntent);
+		System.out.println("onStop");
+	}
+	
+	protected void onDestory(){
+		super.onDestroy();
+//		unregisterReceiver(contrlReceiver);
+		System.out.println("onDestory");
 	}
 
 	@Override

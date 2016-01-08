@@ -740,38 +740,4 @@ public class IHomeService extends Service{
 		}
 		
 	}
-//	SendRunnable sendRunnable = new SendRunnable();
-//	/** 
-//	 * @Description:
-//	 * 	 用于发送信息给服务器
-//	 **/
-//	private class SendRunnable implements Runnable
-//	{
-//		String msgString;
-//		public void sendMsg(String msg)
-//		{
-//			msgString = new String(msg);
-//		}
-//		@Override
-//		public void run() {
-//			// TODO Auto-generated method stub
-//			byte buffer[] = msgString.getBytes();
-//			if(isAuthed == true)
-//			{
-//				try {
-//					outputStream.write(buffer, 0, buffer.length);//发送指令
-//					outputStream.flush();
-//				} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//						isConnected = false; //断开连接
-//						isAuthed = false;    //认证失效
-//				}
-//			}
-//			
-//		}
-//		
-//	}
-
-
 }

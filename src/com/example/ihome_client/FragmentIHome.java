@@ -16,6 +16,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import ihome_client.bottombar.*;
 
@@ -27,8 +28,8 @@ import ihome_client.bottombar.*;
  * @Date:2015/12/25
  * @Description: IHome的Fragment界面
  * @Function List:
- *   1. void onAttach(Activity activity); 用于绑定ClientMainActivity和handler
- *   2. Handler communicationHandler; //用于处理和ClientMainActivity的通信
+ *   1. void onAttach(Activity activity); //用于绑定ClientMainActivity和handler
+ *   2. Handler communicationHandler;     //用于处理和ClientMainActivity的通信
  **/
 
 public class FragmentIHome extends BaseFragment{
