@@ -10,6 +10,12 @@
 
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     
+    <!--  以下是wifi访问网络需要的权限-->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"></uses-permission>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
+    
     <application
         android:allowBackup="true"
         android:icon="@drawable/feather"

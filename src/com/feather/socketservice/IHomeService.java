@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.security.PublicKey;
 
 import com.example.ihome_client.ClientActivity;
@@ -19,6 +22,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -49,15 +53,21 @@ public class IHomeService extends Service{
 	
 	String account, password;
 	public boolean isConnected = false;
-//	private ServiceBinder serviceBinder = new ServiceBinder();
 	private int sleeptime = 100;
 	private boolean accountReady = false;  //是否获得了明确的用户帐户信息和密码
 	private boolean isAuthed = false;
 	private boolean stopallthread = false;
+	private boolean isTestWifi = false;
 	byte buffer[] = new byte[2048]; //2048字节的数组
 	
 	private ServiceReceiver serviceReceiver;
 	private String SERVICE_ACTION = "android.intent.action.MAIN";
+	
+	private String serverString = "139.129.19.115";
+	private String contrlCenterString = "192.168.16.106";
+	
+	/*wifi模式相关*/
+	private WifiManager wifiManager;
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
@@ -83,6 +93,9 @@ public class IHomeService extends Service{
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(SERVICE_ACTION);
 		registerReceiver(serviceReceiver, filter);//注册
+		
+		/*wifi相关*/
+		wifiManager = (WifiManager) getSystemService(Service.WIFI_SERVICE);//获得wifi
 	}
 
 	@Override
@@ -128,6 +141,7 @@ public class IHomeService extends Service{
 	 **/ 
 	Runnable serverConnectRunnable = new Runnable() {
 		
+		boolean iswified = false;
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
@@ -166,41 +180,205 @@ public class IHomeService extends Service{
 							e.printStackTrace();
 						}
 					}
-
-					/*断开连接后,重新连接和身份认证*/
-					try {
-						serverSocket = new Socket("139.129.19.115", 8080);
-						/*得到输入流、输出流*/
-						outputStream = serverSocket.getOutputStream();
-						inputStream = serverSocket.getInputStream();
-						isConnected = true; //連接成功
+					isTestWifi = true;
+					iswified = false;
+					/*检测是否在wifi内能连接到用户*/
+					while(true)
+					{
+						/*检测是否在wifi内能连接到用户*/
+						SocketChannel socketChannel = null;
+						try {
+							socketChannel = SocketChannel.open();
+							socketChannel.configureBlocking(false);
+							socketChannel.connect(new InetSocketAddress(contrlCenterString, 8080));
+							
+							Thread.sleep(500);  //睡眠500ms
+							if(!socketChannel.finishConnect())
+							{
+								iswified = false;
+								break;
+							}
+							else {
+								iswified = true;
+								break;
+							}
+							
+//							/*需要发送的指令,byte数组*/
+//							byte typeBytes[] = {Instruction.COMMAND_MANAGE,Instruction.COMMAND_SEPERATOR};
+//							byte accountBytes[] = account.getBytes("UTF-8");//得到标准的UTF-8编码
+//							byte twoBytes[] = {Instruction.COMMAND_SEPERATOR,Instruction.MAN_LOGIN, Instruction.COMMAND_SEPERATOR};
+//							byte passwordBytes[] = password.getBytes("UTF-8");
+//							byte threeBytes[] = {Instruction.COMMAND_SEPERATOR, Instruction.COMMAND_END};						
+//							byte buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
+//							                       +passwordBytes.length+threeBytes.length];
+//							
+//							int start = 0;
+//							System.arraycopy(typeBytes    ,0,buffer,start, typeBytes.length);
+//							start+=typeBytes.length;
+//							System.arraycopy(accountBytes ,0,buffer,start, accountBytes.length);
+//							start+=accountBytes.length;
+//							System.arraycopy(twoBytes     ,0,buffer,start, twoBytes.length);
+//							start+=twoBytes.length;
+//							System.arraycopy(passwordBytes,0,buffer,start, passwordBytes.length);
+//							start+=passwordBytes.length;
+//							System.arraycopy(threeBytes   ,0,buffer,start, threeBytes.length);
+//							
+//							ByteBuffer buf = ByteBuffer.allocate(48);//48的缓冲区
+//							
+//							buf.clear();
+//							buf.put(buffer);
+//							buf.flip();
+//							
+//							/*发送认证信息给服务器*/
+//							while(buf.hasRemaining()) {   //写好数据
+//								socketChannel.write(buf);
+//							}
+//							int numBytesRead = 0;
+//							buf.clear(); 
+//							
+//							int ri = 0;
+//							while ( ((numBytesRead = socketChannel.read(buf)) != -1) || true) {
+//							        if (numBytesRead == 0) {
+//							          // 如果没有数据，则稍微等待一下
+//							          try {
+//							        	ri++;
+//							        	if(ri > 100)
+//							        		break;
+//							            Thread.sleep(1);
+//							          } catch (InterruptedException e) {
+//							            e.printStackTrace();
+//							          }
+//							          continue;
+//							        }
+//							        else {
+//							        	// 转到最开始
+//								        buf.flip();
+//								        buf.get(buffer, 0, numBytesRead);
+//								        buf.clear();
+//								        //break;
+//									}
+//							}
+//							String revString = new String(buffer, 0, numBytesRead);	
+//							int i = 0;
+//							int type;
+//							while(i<revString.length())//可能有多组信息
+//							{
+//								//if(revString.charAt(i) == Instruction.COMMAND_RESULT)
+//								/*获得指令主type*/
+//								if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
+//								{
+//									type = revString.charAt(i);
+//									i+=2;
+//								}
+//								else {
+//									/*当前指令错误则跳转到下一个指令*/
+//									while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
+//									{
+//										i++;
+//									}
+//									i++;
+//									continue;
+//								}
+//								if(type == Instruction.COMMAND_RESULT)
+//								{
+//									iswified = true;
+//									break;
+//								}
+//							}
+							
+						} catch (IOException e2) {
+							// TODO Auto-generated catch block
+							e2.printStackTrace();
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}finally
+						{
+							try {
+								if(socketChannel != null)//关闭
+									socketChannel.close();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} //关闭
+							break;
+						}
+					}//end of connecting stm32 by wifi
+					isTestWifi = false;
+					if(iswified == true)
+					{
+						/*断开连接后,重新连接和身份认证*/
+						try {
+							serverSocket = new Socket(contrlCenterString, 8080);
+							/*得到输入流、输出流*/
+							outputStream = serverSocket.getOutputStream();
+							inputStream = serverSocket.getInputStream();
+							isConnected = true; //連接成功
+							
+							/*告诉activity重新连接成功*/
+							intent.setAction(intent.ACTION_EDIT);
+							intent.putExtra("type", "disconnect");
+							intent.putExtra("disconnect", "connected");
+							sendBroadcast(intent);
+						} catch (UnknownHostException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							isConnected = false; //連接失敗
+							try {
+								Thread.sleep(2500);  //失败后等待3s连接
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							isConnected = false; //连接失败
+							try {
+								Thread.sleep(2500);  //失败后等待3s连接
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						}	 
+					}//end of connecting ContrlCenter
+					else {
+						/*断开连接后,重新连接和身份认证*/
+						try {
+							serverSocket = new Socket(serverString, 8080);
+							/*得到输入流、输出流*/
+							outputStream = serverSocket.getOutputStream();
+							inputStream = serverSocket.getInputStream();
+							isConnected = true; //連接成功
+							
+							/*告诉activity重新连接成功*/
+							intent.setAction(intent.ACTION_EDIT);
+							intent.putExtra("type", "disconnect");
+							intent.putExtra("disconnect", "connected");
+							sendBroadcast(intent);
+						} catch (UnknownHostException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							isConnected = false; //連接失敗
+							try {
+								Thread.sleep(2500);  //失败后等待3s连接
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							isConnected = false; //连接失败
+							try {
+								Thread.sleep(2500);  //失败后等待3s连接
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						}	
 						
-						/*告诉activity重新连接成功*/
-						intent.setAction(intent.ACTION_EDIT);
-						intent.putExtra("type", "disconnect");
-						intent.putExtra("disconnect", "connected");
-						sendBroadcast(intent);
-					} catch (UnknownHostException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						isConnected = false; //連接失敗
-						try {
-							Thread.sleep(2500);  //失败后等待3s连接
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						isConnected = false; //连接失败
-						try {
-							Thread.sleep(2500);  //失败后等待3s连接
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}	
+					}//end of connecting server
 				}
 				if(isConnected && accountReady && (isAuthed == false))
 				{
@@ -409,6 +587,16 @@ public class IHomeService extends Service{
 				if(stopallthread)
 				{
 					break;
+				}
+				if(isTestWifi == true)//正在测试wifi能否连接到stm32
+				{
+					try {
+						Thread.sleep(1000);//先休眠一秒
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					continue;
 				}
 				while(isConnected == false)//断开连接，先等待重新链接
 				{

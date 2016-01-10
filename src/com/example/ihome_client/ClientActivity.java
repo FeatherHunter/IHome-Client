@@ -3,12 +3,15 @@ package com.example.ihome_client;
 import ihome_client.bottombar.BottomBarPanel;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -60,7 +63,8 @@ public class ClientActivity extends Activity {
 									//可能同时收到多个登陆成功广播，导致多次切换
 	
 	private Intent serviceIntent; //服务Intent
-	
+	private WifiManager wifiManager; //优先开启wifi模式
+	private Toast toast;             //自定义Toast
 	//IHomeService.ServiceBinder serviceBinder;//IHomeService中的binder
 	
 	/**
@@ -86,6 +90,15 @@ public class ClientActivity extends Activity {
 		client_login.setOnClickListener(new LoginButtonListener());
 		client_bluetooth.setOnClickListener(new BluetoothButtonListener());
 
+		wifiManager = (WifiManager) ClientActivity.this.getSystemService(Service.WIFI_SERVICE);
+		if(wifiManager.getWifiState() != WifiManager.WIFI_STATE_ENABLED)//wifi没有打开
+		{
+			wifiManager.setWifiEnabled(true);
+		}
+		toast = Toast.makeText(getApplicationContext(), "tip:和终端在同一WIFI内不消耗您的流量", Toast.LENGTH_LONG);
+		toast.setGravity(Gravity.TOP, 0, 0);
+		toast.show();
+		//Toast.makeText(ClientActivity.this, "tip:和终端在同一WIFI内不消耗您的流量", Toast.LENGTH_LONG).show();
 		/* connect server */
 		dialog = new ProgressDialog(this);
 		dialog.setTitle("提示");
@@ -154,7 +167,7 @@ public class ClientActivity extends Activity {
 		public void run() {
 			// TODO Auto-generated method stub
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
