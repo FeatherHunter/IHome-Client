@@ -1,6 +1,7 @@
 package com.example.ihome_client;
 
 import ihome_client.bottombar.BottomBarPanel;
+import android.R.integer;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.Service;
@@ -167,7 +168,7 @@ public class ClientActivity extends Activity {
 		public void run() {
 			// TODO Auto-generated method stub
 			try {
-				Thread.sleep(10000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -201,38 +202,68 @@ public class ClientActivity extends Activity {
 	 */
 	private class AuthReceiver extends BroadcastReceiver{
 
+		int failed_conter; //多次接到失败信息只显示一次
 		public AuthReceiver() {
 			// TODO Auto-generated constructor stub
+			failed_conter = 0; //初始化
 		}
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
 				String resultString = intent.getStringExtra("result");
-				if(resultString.equals("success"))
+				if(resultString.equals("server"))
 				{
-					if(firstSwitch == false) return;
-					firstSwitch = false;
-					/*切换到主控界面*/
-		    		Intent intentMain = new Intent();
-					
-		    		intentMain.putExtra("mode", 1);//选择模式：1为ethnet模式
-		    		intentMain.putExtra("account", client_account.getText().toString());
-		    		intentMain.setClass(ClientActivity.this, ClientMainActivity.class);
-		            ClientActivity.this.startActivity(intentMain);
-		            
-					isAuthed = true;
+					if(intent.getStringExtra("server").equals("success"))
+					{
+						if(firstSwitch == false) return;
+						firstSwitch = false;
+						/*切换到主控界面*/
+			    		Intent intentMain = new Intent();
+						
+			    		intentMain.putExtra("mode", 1);//选择模式：1为server Mode
+			    		intentMain.putExtra("account", client_account.getText().toString());
+			    		intentMain.setClass(ClientActivity.this, ClientMainActivity.class);
+			            ClientActivity.this.startActivity(intentMain);
+			            isAuthed = true;
+			            failed_conter = 0; //清除失败显示计数器
+						
+					}else{
+						if(failed_conter == 0)
+						{
+							Toast.makeText(ClientActivity.this, "连接服务器失败,点击help获得帮助", Toast.LENGTH_SHORT).show();
+						}
+						failed_conter++;
+						if(failed_conter == 10) failed_conter = 0;
+					}
+
 					dialog.dismiss(); //登陆成功，解除进度条
 				}
-				else if (resultString.equals("falied")) {
-					if(firstSwitch == false) return;
-					firstSwitch = false;
+				else if (resultString.equals("center")){
 					
-					Toast.makeText(ClientActivity.this, "登陆失败！", Toast.LENGTH_SHORT).show();
-					/*清空输入*/
-					client_account.setText("");
-					client_password.setText("");
-					isAuthed = false;
+					if(intent.getStringExtra("center").equals("success"))
+					{
+						if(firstSwitch == false) return;
+						firstSwitch = false;
+						/*切换到主控界面*/
+			    		Intent intentMain = new Intent();
+						
+			    		intentMain.putExtra("mode", 2);//选择模式：1为server Mode
+			    		intentMain.putExtra("account", client_account.getText().toString());
+			    		intentMain.setClass(ClientActivity.this, ClientMainActivity.class);
+			            ClientActivity.this.startActivity(intentMain);
+			            isAuthed = true;
+			            failed_conter = 0; //清除失败显示计数器
+						
+					}else{
+						if(failed_conter == 0)
+						{
+							Toast.makeText(ClientActivity.this, "连接Center失败,点击help获得帮助", Toast.LENGTH_SHORT).show();
+						}
+						failed_conter++;
+						if(failed_conter == 10) failed_conter = 0;
+					}
 					dialog.dismiss(); //登陆失败，解除进度条
+
 				}
 				else if(resultString.equals("relogin"))
 				{

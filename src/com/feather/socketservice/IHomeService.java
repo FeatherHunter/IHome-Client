@@ -32,17 +32,20 @@ import android.widget.Toast;
  * @CopyRight: 王辰浩 2015~2025
  * @qq:975559549
  * @Author Feather Hunter(猎羽)
- * @Version:1.0
- * @Date:2015/12/25
- * @Description: 后台service服务,用于与服务器之间的通信。
+ * @Version:2.10
+ * @Date:2016/1/10
+ * @Description: 后台service服务,用于与服务器之间的通信。支持wifi模式和ethernet
  *              并将收到的信息经过处理后，广播给各个activity。
  * @Function list:
  *     1. int onStartCommand(Intent intent, int flags, int startId)//处理其他activity发送过来的数据
- *     2. authRunnable //认证线程，发送身份信息给服务器
- *     3. serverConnectRunnable //连接服务器的线程
- *     4. allInfoFlushRunnable //发送请求以得到温度等所有参数的数据
- *     5. revMsgRunnable       //无限循环接收服务器发来的信息
- *     6. void onDestroy() //关闭socket
+ *     2. authRunnable           //认证线程，发送身份信息给服务器
+ *     3. serverConnectRunnable  //连接服务器的线程
+ *     4. allInfoFlushRunnable   //发送请求以得到温度等所有参数的数据
+ *     5. revMsgRunnable         //无限循环接收服务器发来的信息
+ *     6. void onDestroy()       //关闭socket
+ * @History:
+ *     v1.0  @date 2015/12/25 Service启动后，自动连接服务器，连接成功后，负责与服务器间通信。会自动短线重连
+ *     v2.10 @date 2016/1/10  增加wifi内连接控制中心的功能，失败后尝试连接服务器。
  **/
 
 public class IHomeService extends Service{
@@ -52,12 +55,15 @@ public class IHomeService extends Service{
 	InputStream inputStream;   //input from server
 	
 	String account, password;
-	public boolean isConnected = false;
 	private int sleeptime = 100;
 	private boolean accountReady = false;  //是否获得了明确的用户帐户信息和密码
-	private boolean isAuthed = false;
-	private boolean stopallthread = false;
-	private boolean isTestWifi = false;
+	
+	public boolean isConnected = false;  //是否连接成功
+	private boolean isAuthed   = false;  //是否验证成功
+	private boolean isTestWifi = false;  //正在测试wifi内能否连接上控制中心，此时停止TCP接受信息线程
+	private boolean iswified   = false;  //是否wifi内连接控制中心成功
+	
+	private boolean stopallthread = false; //停止所有线程
 	byte buffer[] = new byte[2048]; //2048字节的数组
 	
 	private ServiceReceiver serviceReceiver;
@@ -68,12 +74,22 @@ public class IHomeService extends Service{
 	
 	/*wifi模式相关*/
 	private WifiManager wifiManager;
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/**
+	 * @Function: public void onCreate();
+	 * @Description:
+	 *      1. 创建连接线程：用于wifi内直接连接控制中心或者通过ethernet连接服务器
+	 *      2. 创建接受信息线程： 接受目标的信息
+	 *      3. 创建更新温度湿度等数据的线程，同时作为心跳函数。
+	 *      4. 动态注册receiver-接受来自其他模块的信息，并将其转发给服务器。
+	 *      5. 获取wifimanager管理器。
+	 **/
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
@@ -98,6 +114,11 @@ public class IHomeService extends Service{
 		wifiManager = (WifiManager) getSystemService(Service.WIFI_SERVICE);//获得wifi
 	}
 
+	/**
+	 * @Function: int onStartCommand();
+	 * @Description:
+	 *      1. 用于接受登陆界面发送来的账号和密码信息用于登录。
+	 **/
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// TODO Auto-generated method stub
@@ -119,7 +140,14 @@ public class IHomeService extends Service{
 		}
 		return super.onStartCommand(intent, flags, startId);
 	}
-
+	
+	/**
+	 * @Function: void onDestroy();
+	 * @Description:
+	 *      用于销毁Service时候的收尾工作。
+	 *      1. 关闭socket
+	 *      2. 解除动态注册的Receiver 
+	 **/
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
@@ -137,11 +165,13 @@ public class IHomeService extends Service{
 	}
 
 	/**
-	 * @Description:连接到服务器兵器,开启接受信息的线程
-	 **/ 
+	 * @Function: serverConnectRunnable;
+	 * @Description:
+	 *      用于连接服务器或者控制中心，并且断线的时候重新连接。
+	 *      1. 关闭socket
+	 *      2. 解除动态注册的Receiver 
+	 **/
 	Runnable serverConnectRunnable = new Runnable() {
-		
-		boolean iswified = false;
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
@@ -161,8 +191,9 @@ public class IHomeService extends Service{
 						e.printStackTrace();
 					}
 				}
-				if(isConnected == false)
+				if(accountReady && (isConnected == false))//身份确定并且没有连接
 				{
+					System.out.println("accountReady is true");
 					/*正在重新连接*/
 					Intent intent = new Intent();
 					intent.setAction(intent.ACTION_EDIT);
@@ -183,125 +214,36 @@ public class IHomeService extends Service{
 					isTestWifi = true;
 					iswified = false;
 					/*检测是否在wifi内能连接到用户*/
-					while(true)
+					if(wifiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED)//wifi已经打开
 					{
-						/*检测是否在wifi内能连接到用户*/
 						SocketChannel socketChannel = null;
 						try {
 							socketChannel = SocketChannel.open();
 							socketChannel.configureBlocking(false);
 							socketChannel.connect(new InetSocketAddress(contrlCenterString, 8080));
 							
-							Thread.sleep(500);  //睡眠500ms
+							Thread.sleep(1000);  //睡眠500ms
 							if(!socketChannel.finishConnect())
 							{
 								iswified = false;
-								break;
 							}
 							else {
 								iswified = true;
-								break;
 							}
-							
-//							/*需要发送的指令,byte数组*/
-//							byte typeBytes[] = {Instruction.COMMAND_MANAGE,Instruction.COMMAND_SEPERATOR};
-//							byte accountBytes[] = account.getBytes("UTF-8");//得到标准的UTF-8编码
-//							byte twoBytes[] = {Instruction.COMMAND_SEPERATOR,Instruction.MAN_LOGIN, Instruction.COMMAND_SEPERATOR};
-//							byte passwordBytes[] = password.getBytes("UTF-8");
-//							byte threeBytes[] = {Instruction.COMMAND_SEPERATOR, Instruction.COMMAND_END};						
-//							byte buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
-//							                       +passwordBytes.length+threeBytes.length];
-//							
-//							int start = 0;
-//							System.arraycopy(typeBytes    ,0,buffer,start, typeBytes.length);
-//							start+=typeBytes.length;
-//							System.arraycopy(accountBytes ,0,buffer,start, accountBytes.length);
-//							start+=accountBytes.length;
-//							System.arraycopy(twoBytes     ,0,buffer,start, twoBytes.length);
-//							start+=twoBytes.length;
-//							System.arraycopy(passwordBytes,0,buffer,start, passwordBytes.length);
-//							start+=passwordBytes.length;
-//							System.arraycopy(threeBytes   ,0,buffer,start, threeBytes.length);
-//							
-//							ByteBuffer buf = ByteBuffer.allocate(48);//48的缓冲区
-//							
-//							buf.clear();
-//							buf.put(buffer);
-//							buf.flip();
-//							
-//							/*发送认证信息给服务器*/
-//							while(buf.hasRemaining()) {   //写好数据
-//								socketChannel.write(buf);
-//							}
-//							int numBytesRead = 0;
-//							buf.clear(); 
-//							
-//							int ri = 0;
-//							while ( ((numBytesRead = socketChannel.read(buf)) != -1) || true) {
-//							        if (numBytesRead == 0) {
-//							          // 如果没有数据，则稍微等待一下
-//							          try {
-//							        	ri++;
-//							        	if(ri > 100)
-//							        		break;
-//							            Thread.sleep(1);
-//							          } catch (InterruptedException e) {
-//							            e.printStackTrace();
-//							          }
-//							          continue;
-//							        }
-//							        else {
-//							        	// 转到最开始
-//								        buf.flip();
-//								        buf.get(buffer, 0, numBytesRead);
-//								        buf.clear();
-//								        //break;
-//									}
-//							}
-//							String revString = new String(buffer, 0, numBytesRead);	
-//							int i = 0;
-//							int type;
-//							while(i<revString.length())//可能有多组信息
-//							{
-//								//if(revString.charAt(i) == Instruction.COMMAND_RESULT)
-//								/*获得指令主type*/
-//								if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
-//								{
-//									type = revString.charAt(i);
-//									i+=2;
-//								}
-//								else {
-//									/*当前指令错误则跳转到下一个指令*/
-//									while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
-//									{
-//										i++;
-//									}
-//									i++;
-//									continue;
-//								}
-//								if(type == Instruction.COMMAND_RESULT)
-//								{
-//									iswified = true;
-//									break;
-//								}
-//							}
-							
-						} catch (IOException e2) {
+						} catch (IOException e) {
 							// TODO Auto-generated catch block
-							e2.printStackTrace();
-						} catch (InterruptedException e1) {
+							e.printStackTrace();
+						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}finally
-						{
+							e.printStackTrace();
+						}finally{
 							try {
 								if(socketChannel != null)//关闭
 									socketChannel.close();
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
-							} //关闭
-							break;
+							}	
 						}
 					}//end of connecting stm32 by wifi
 					isTestWifi = false;
@@ -380,6 +322,7 @@ public class IHomeService extends Service{
 						
 					}//end of connecting server
 				}
+				/*在连接成功和用户身份确定的时候，进行身份认证*/
 				if(isConnected && accountReady && (isAuthed == false))
 				{
 					/*通知activity正在验证信息*/
@@ -565,10 +508,11 @@ public class IHomeService extends Service{
 		
 	};
 	
-	
 	/**
-	 * @Description:等待接收服务器发来的信息
-	 **/
+	* @Function: revMsgRunnable;
+	* @Description:
+	*      用于接受并且处理服务器发送来的信息
+	**/
 	Runnable revMsgRunnable = new Runnable() {
 
 		@Override
@@ -643,7 +587,7 @@ public class IHomeService extends Service{
 						i++;
 						accountString = new String(revString.substring(start, end));
 						/*确定来自于自己的控制中心或者自己*/
-						if(!accountString.equals(account+"h")&&!accountString.equals(account))
+						if(!accountString.equals(account+'h')&&!accountString.equals("SERVER"))
 						{
 							while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
 							{
@@ -706,7 +650,15 @@ public class IHomeService extends Service{
 									{
 										Intent intent = new Intent();
 										intent.setAction(intent.ACTION_ANSWER);
-							    		intent.putExtra("result", "success");
+										if(accountString.equals("SERVER"))
+										{
+											intent.putExtra("result", "server");
+											intent.putExtra("server", "success");
+										}
+										else {
+											intent.putExtra("result", "center");
+											intent.putExtra("center", "success");
+										}
 							            sendBroadcast(intent);
 							            isAuthed = true; //身份认真成功
 							            
@@ -720,9 +672,18 @@ public class IHomeService extends Service{
 									{
 										Intent intent = new Intent();
 										intent.setAction(intent.ACTION_ANSWER);
-							    		intent.putExtra("result", "failed");
+										if(accountString.equals("SERVER"))
+										{
+											intent.putExtra("result", "server");
+											intent.putExtra("server", "failed");
+										}
+										else {
+											intent.putExtra("result", "center");
+											intent.putExtra("center", "failed");
+										}
 							            sendBroadcast(intent);
 										isAuthed = false;    //认证失败
+										accountReady = false;  //信息错误
 									}//end of login state
 								}
 								else 
@@ -918,6 +879,15 @@ public class IHomeService extends Service{
 				isConnected = false;
 				isAuthed = false;
 				accountReady = false;
+				if(serverSocket != null)//如果有socket连接则解除连接
+				{
+					try {
+						serverSocket.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 				
 				/*通知登录activity要进行重新登录*/
 				Intent intent1 = new Intent();

@@ -104,12 +104,21 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		}
 		
 	};
+	/**
+	 * @Function: protected void onCreate
+	 * @Description:
+	 *      ClientMainActivity创建后的操作
+	 *      1.initUI()初始化UI界面，包括底层栏
+	 *      2.获取从ClientActivity传递的信息，确定处于内网模式还是外网模式。
+	 *      3.动态注册Receiver(用于将从Service接受的结果发送给IHome Fragment并做出相应改变)
+	 **/
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_client_main);
 		/*初始化界面*/
 		currFragTag = "";
 		initUI();
+		
 		fragmentManager = getFragmentManager();
 		setDefaultFirstFragment(Constant.FRAGMENT_FLAG_IHOME);
 		
@@ -117,13 +126,13 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		int mode = intent.getIntExtra("mode", 2); //得到模式信息，默认为蓝牙模式2
 		if(mode == 1)//ethnet模式
 		{
-			Toast.makeText(this, "当前处于网络模式", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "进入网络模式", Toast.LENGTH_SHORT).show();
 			isConnected = true; //连接成功
 
 		}
-		else if(mode == 2)//当前处于蓝牙模式
+		else if(mode == 2)//当前处于内网连接控制中心模式
 		{
-			Toast.makeText(this, "当前处于蓝牙模式", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "进入内网模式", Toast.LENGTH_SHORT).show();
 		}
 		try {
 			/*动态注册receiver*/
@@ -435,13 +444,11 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
-
 		System.out.println("onStop");
 	}
 	
 	protected void onDestory(){
 		super.onDestroy();
-//		unregisterReceiver(contrlReceiver);
 		System.out.println("onDestory");
 	}
 
