@@ -3,7 +3,7 @@
     android:id="@+id/client_relativelayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.ihome_client.ClientActivity"
+    tools:context="com.feather.activity.ClientActivity"
     android:background="@drawable/login_background">
 
 	<ImageView 

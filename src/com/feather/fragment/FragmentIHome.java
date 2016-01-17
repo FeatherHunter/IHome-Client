@@ -1,6 +1,11 @@
-package com.example.ihome_client;
+package com.feather.fragment;
 
 import java.io.UnsupportedEncodingException;
+
+import com.example.ihome_client.R;
+import com.feather.activity.ClientMainActivity;
+import com.feather.activity.Instruction;
+import com.feather.bottombar.*;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -18,7 +23,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import ihome_client.bottombar.*;
 
 /** 
  * @CopyRight: Íõ³½ºÆ 2015~2025

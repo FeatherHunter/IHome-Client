@@ -1,7 +1,8 @@
 
-package ihome_client.bottombar;
+package com.feather.bottombar;
 
-import com.example.ihome_client.FragmentIHome;
+import com.feather.fragment.FragmentIHome;
+import com.feather.fragment.FragmentVideo;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -100,8 +101,10 @@ public class BaseFragment extends Fragment {
 		if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_IHOME)){
 			baseFragment = new FragmentIHome();
 		}
-		/*else if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_MESSAGE)){
-			baseFragment = new MessageFragment();
+		else if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_VIDEO)){//สำฦต
+			baseFragment = new FragmentVideo();
+		}
+		/*
 		}else if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_NEWS)){
 			baseFragment = new NewsFragment();
 		}else if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_SETTING)){

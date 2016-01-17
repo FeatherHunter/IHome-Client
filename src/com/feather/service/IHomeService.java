@@ -1,5 +1,6 @@
-package com.feather.socketservice;
+package com.feather.service;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,10 +12,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.security.PublicKey;
 
-import com.example.ihome_client.ClientActivity;
-import com.example.ihome_client.ClientMainActivity;
-import com.example.ihome_client.Instruction;
+import javax.security.auth.PrivateCredentialPermission;
+
 import com.example.ihome_client.R.bool;
+import com.feather.activity.ClientActivity;
+import com.feather.activity.ClientMainActivity;
+import com.feather.activity.Instruction;
 
 import android.R.integer;
 import android.app.Service;
@@ -54,23 +57,35 @@ public class IHomeService extends Service{
 	OutputStream outputStream; //ouput to server
 	InputStream inputStream;   //input from server
 	
+	/*视频专用连接*/
+	Socket videoSocket;
+	OutputStream videoOutputStream; //ouput to target
+	InputStream videoInputStream;   //input from target
+	
 	String account, password;
 	private int sleeptime = 100;
 	private boolean accountReady = false;  //是否获得了明确的用户帐户信息和密码
 	
-	public boolean isConnected = false;  //是否连接成功
+	public boolean isConnected = false;  //通用连接 是否连接成功
+	public boolean videoIsConnected = false;
 	private boolean isAuthed   = false;  //是否验证成功
 	private boolean isTestWifi = false;  //正在测试wifi内能否连接上控制中心，此时停止TCP接受信息线程
 	private boolean iswified   = false;  //是否wifi内连接控制中心成功
 	
 	private boolean stopallthread = false; //停止所有线程
-	byte buffer[] = new byte[2048]; //2048字节的数组
+	byte buffer[] = new byte[2048]; //2048字节的指令缓冲区
+	byte videoBuffer[] = new byte[4096]; //4096的视频文件缓冲区
 	
 	private ServiceReceiver serviceReceiver;
 	private String SERVICE_ACTION = "android.intent.action.MAIN";
 	
 	private String serverString = "139.129.19.115";
 	private String contrlCenterString = "192.168.16.106";
+	private int generalPort = 8080;
+	private int videoPort   = 8081;
+	private String cameraIDString = "20000";
+	
+	private FileOutputStream jpegOutputStream = null;
 	
 	/*wifi模式相关*/
 	private WifiManager wifiManager;
@@ -101,7 +116,11 @@ public class IHomeService extends Service{
 		thread = new Thread(revMsgRunnable);
 		thread.start();	
 		/*开启更新数据和心跳*/
-		thread = new Thread(allInfoFlushRunnable);
+		//thread = new Thread(allInfoFlushRunnable);
+		//thread.start();
+		
+		/*开启更新数据和心跳*/
+		thread = new Thread(videoConnectRunnable);
 		thread.start();
 		
 		/*动态注册receiver*/
@@ -387,6 +406,133 @@ public class IHomeService extends Service{
 		}
 	};
 	
+	/**
+	 * @Function: videoConnectRunnable;
+	 * @Description:
+	 *      视频专用连接，用于接受视频信息
+	 */
+	Runnable videoConnectRunnable = new Runnable() {
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			while(true)
+			{
+				if(stopallthread)
+				{
+					break;
+				}
+				/*指令专用链接认证不成功，则视频的也不会成功，等待*/
+				while(!isAuthed) 
+				{
+					try {
+						Thread.sleep(1000);  //睡眠
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				if((isAuthed == true)&&(videoIsConnected == false))
+				{
+					/*正在重新连接*/
+					Intent intent = new Intent();
+					intent.setAction(intent.ACTION_EDIT);
+					intent.putExtra("type", "disconnect");
+					intent.putExtra("disconnect", "视频连接中...");
+					sendBroadcast(intent);
+					
+					/*之前有过socket连接,先关闭，再开启新的*/
+					if(videoSocket != null)
+					{
+						try {
+							videoSocket.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					if(iswified == true)
+					{
+						/*断开连接后,重新连接*/
+						try {
+							videoSocket = new Socket(contrlCenterString, videoPort);
+							/*得到输入流、输出流*/
+							videoOutputStream = videoSocket.getOutputStream();
+							videoInputStream = videoSocket.getInputStream();
+							videoIsConnected = true; //视频連接成功
+							
+							/*告诉activity重新连接成功*/
+							intent.setAction(intent.ACTION_EDIT);
+							intent.putExtra("type", "disconnect");
+							intent.putExtra("disconnect", "视频连接成功");
+							sendBroadcast(intent);
+						} catch (UnknownHostException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							videoIsConnected = false; //連接失敗
+							try {
+								Thread.sleep(2500);  //失败后等待3s连接
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							videoIsConnected = false; //连接失败
+							try {
+								Thread.sleep(2500);  //失败后等待3s连接
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						}	 
+					}//end of connecting ContrlCenter
+					else {
+						/*断开连接后,重新连接*/
+						try {
+							videoSocket = new Socket(serverString, videoPort);
+							/*得到输入流、输出流*/
+							videoOutputStream = videoSocket.getOutputStream();
+							videoInputStream = videoSocket.getInputStream();
+							videoIsConnected = true; //视频連接成功
+							
+							/*告诉activity重新连接成功*/
+							intent.setAction(intent.ACTION_EDIT);
+							intent.putExtra("type", "disconnect");
+							intent.putExtra("disconnect", "视频连接成功");
+							sendBroadcast(intent);
+						} catch (UnknownHostException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							videoIsConnected = false; //連接失敗
+							try {
+								Thread.sleep(2500);  //失败后等待3s连接
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							videoIsConnected = false; //连接失败
+							try {
+								Thread.sleep(2500);  //失败后等待3s连接
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						}	
+						
+					}//end of connecting video
+				}//end of isAuthed true and videoIsConnected false
+
+			}//end of while(1)
+			
+		}//end of run
+	
+	};
+	
 	
 	/**
 	 * @Description:用于定时得到温度,湿度,灯初始信息---起到心跳的作用
@@ -523,7 +669,7 @@ public class IHomeService extends Service{
 			int end;
 			int type;
 			String accountString;
-			int subtype;
+			int subtype = 0;
 			int res;
 			
 			while(true)
@@ -559,9 +705,15 @@ public class IHomeService extends Service{
 					{
 						throw new Exception("断开连接");
 					}
+//					Intent tempintent = new Intent();
+//					tempintent.setAction(tempintent.ACTION_EDIT);
+//					/*返回ihome模式开启情况*/
+//					tempintent.putExtra("type", "video");
+//					tempintent.putExtra("video", "read:"+temp);
+//					sendBroadcast(tempintent);
 					String revString = new String(buffer, 0, temp);	
 					i = 0;
-					System.out.println("get msg from server");
+					System.out.println("get msg from server read:"+temp+" string:"+revString.length());
 					while(i<revString.length())//可能有多组信息
 					{
 						/*获得指令主type*/
@@ -586,7 +738,7 @@ public class IHomeService extends Service{
 						}
 						i++;
 						accountString = new String(revString.substring(start, end));
-						/*确定来自于自己的控制中心或者自己*/
+						/*确定来自于自己的控制中心或者SERVER*/
 						if(!accountString.equals(account+'h')&&!accountString.equals("SERVER"))
 						{
 							while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
@@ -827,6 +979,212 @@ public class IHomeService extends Service{
 					e.printStackTrace();			
 					isConnected = false; //断开连接
 					isAuthed = false;    //认证失效
+				}
+			}
+			
+		}
+		
+	};
+	
+	/**
+	* @Function: revVideoRunnable;
+	* @Description:
+	*      用于接受视频文件并且保存到手机中
+	**/
+	Runnable revVideoRunnable = new Runnable() {
+
+		private byte[] videoHandleBuffer = new byte[4096];
+		private int videoEnd = 0;
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			int i;
+			int start;
+			int end;
+			int type;
+			String accountString;
+			String cameraIDString;
+			String dataLengthString;
+			int dataLength;
+			int subtype = 0;
+			int res;
+			int msgStart;
+			
+			while(true)
+			{
+				if(stopallthread)
+				{
+					break;
+				}
+				while(videoIsConnected == false)//连接已经断开，先等待重新链接
+				{
+					try {
+						Thread.sleep(1000);//先休眠一秒等待链接
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				try {
+
+					/*得到服务器返回信息*/
+					int temp = videoInputStream.read(videoBuffer);
+					if(temp < 0)
+					{
+						throw new Exception("断开连接");
+					}
+//					Intent tempintent = new Intent();
+//					tempintent.setAction(tempintent.ACTION_EDIT);
+//					/*返回ihome模式开启情况*/
+//					tempintent.putExtra("type", "video");
+//					tempintent.putExtra("video", "read:"+temp);
+//					sendBroadcast(tempintent);
+					//先复制到处理的缓冲区中
+					System.arraycopy(videoBuffer    ,0,videoHandleBuffer, videoEnd, temp);
+					videoEnd += temp;
+					i = 0;
+					System.out.println("get msg from server read:"+temp);
+					while(i < videoHandleBuffer.length)//可能有多组信息
+					{
+						msgStart = i; //记录本次处理的信息头
+						/*获得指令主type*/
+						if((i + 1 <videoHandleBuffer.length)&&(videoHandleBuffer[i+1] ==Instruction.COMMAND_SEPERATOR))
+						{
+							type = videoHandleBuffer[i];
+							i+=2;
+						}
+						else {
+							/*当前指令错误则跳转到下一个指令*/
+							while((i<videoHandleBuffer.length)&&(videoHandleBuffer[i])!=Instruction.COMMAND_END)
+							{
+								i++;
+							}
+							i++;
+							continue;
+						}
+						/*获得账户*/
+						for(start = i, end = start; (end<videoHandleBuffer.length)&&((videoHandleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+						{
+							;
+						}
+						i++;
+						accountString = new String(videoHandleBuffer, start, end);
+						/*确定来自于自己的控制中心或者SERVER*/
+						if(!accountString.equals(account+'h')&&!accountString.equals("SERVER"))
+						{
+							/*当前指令错误则跳转到下一个指令*/
+							while((i<videoHandleBuffer.length)&&(videoHandleBuffer[i])!=Instruction.COMMAND_END)
+							{
+								i++;
+							}
+							i++;
+							continue;
+						}
+					   /*-------------------先处理视频指令------------------------*/
+						if(type == Instruction.COMMAND_VIDEO)
+						{	
+							/*获得摄像头ID*/
+							for(start = i, end = start; (end<videoHandleBuffer.length)&&((videoHandleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+							{
+								;
+							}
+							i++;
+							cameraIDString = new String(videoHandleBuffer, start, end);
+							if(cameraIDString.equals(cameraIDString))//确定为需要的视频ID：20000
+							{
+								subtype = videoHandleBuffer[i];
+								if(subtype == Instruction.VIDEO_START)//视频流开始
+								{
+									i += 2;
+									try {
+										jpegOutputStream = new FileOutputStream("mnt/sdcard/camera.jpg");
+									} catch (Exception e) {
+										// TODO: handle exception
+										e.printStackTrace();
+									}
+									Intent intent = new Intent();
+									intent.setAction(intent.ACTION_EDIT);
+									/*返回ihome模式开启情况*/
+									intent.putExtra("type", "video");
+									intent.putExtra("video", "video start");
+									sendBroadcast(intent);
+									
+								}//end of video_start
+								else if(subtype == Instruction.VIDEO_STOP)//数据流结束
+								{
+									i += 2;
+									
+									Intent intent = new Intent();
+									intent.setAction(intent.ACTION_EDIT);
+									/*返回ihome模式开启情况*/
+									intent.putExtra("type", "video");
+									intent.putExtra("video", "video stop");
+									sendBroadcast(intent);
+									
+									if(jpegOutputStream != null)
+									{
+										try {
+											jpegOutputStream.close();//关闭输出流
+										} catch (Exception e) {
+											// TODO: handle exception
+											e.printStackTrace();
+										}
+									}
+								}//end of video stop
+								else {
+									/*获得数据长度*/
+									for(start = i, end = start; (end<videoHandleBuffer.length)&&((videoHandleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+									{
+										;
+									}
+									i++;
+									dataLengthString = new String(videoHandleBuffer, start, end);
+									/*数据长度*/
+									dataLength = Integer.valueOf(dataLengthString);
+									//说明为数据
+									
+									if(i + dataLength <= videoHandleBuffer.length)//收到所有的数据
+									{
+										try {
+											jpegOutputStream.write(videoHandleBuffer, i, i + dataLength);
+											Intent intent = new Intent();
+											intent.setAction(intent.ACTION_EDIT);
+											/*返回ihome模式开启情况*/
+											intent.putExtra("type", "video");
+											intent.putExtra("video", dataLength+" ");
+											sendBroadcast(intent);
+										} catch (Exception e) {
+											// TODO: handle exception
+											e.printStackTrace();
+										}
+									}
+									else {//没有受到所有数据
+										System.arraycopy(videoHandleBuffer    , msgStart ,videoHandleBuffer, 0, videoHandleBuffer.length - msgStart);
+										videoEnd = 10;
+									}
+									i += dataLength;
+								}//end of 是数据
+								continue;
+
+							}//end of camera id
+							
+						}//end of 视频指令
+					
+					}//end of while(i < videoHandleBuffer.length) 处理多组信息
+						
+					
+				} catch (UnknownHostException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					videoIsConnected = false; //断开连接
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					videoIsConnected = false; //断开连接
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.printStackTrace();			
+					videoIsConnected = false; //断开连接
 				}
 			}
 			

@@ -1,6 +1,5 @@
-package com.example.ihome_client;
+package com.feather.activity;
 
-import ihome_client.bottombar.BottomBarPanel;
 import android.R.integer;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -22,7 +21,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.feather.socketservice.IHomeService;
+import com.example.ihome_client.R;
+import com.feather.bottombar.BottomBarPanel;
+import com.feather.service.IHomeService;
 
 /** 
  * @CopyRight: Íõ³½ºÆ 2015~2025

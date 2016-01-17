@@ -1,15 +1,18 @@
-package com.example.ihome_client;
+package com.feather.activity;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.feather.socketservice.IHomeService;
+import com.example.ihome_client.R;
+import com.feather.bottombar.BaseFragment;
+import com.feather.bottombar.BottomBarPanel;
+import com.feather.bottombar.Constant;
+import com.feather.bottombar.BottomBarPanel.BottomPanelCallback;
+import com.feather.fragment.FragmentIHome;
+import com.feather.fragment.FragmentVideo;
+import com.feather.service.IHomeService;
 
-import ihome_client.bottombar.BaseFragment;
-import ihome_client.bottombar.BottomBarPanel;
-import ihome_client.bottombar.BottomBarPanel.BottomPanelCallback;
-import ihome_client.bottombar.Constant;
 
 import android.app.*;
 import android.content.BroadcastReceiver;
@@ -36,7 +39,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import ihome_client.*;
 
 /** 
  * @CopyRight: 王辰浩 2015~2025
@@ -51,6 +53,11 @@ import ihome_client.*;
  *        3.如果按下了返回键，会调用onKeyDown函数进行处理：解除注册的Receiver和发送“连接中断”给Service。并且返回到ClientActivity
  *        4.Receiver等待Service的广播，并将处理的结果通过setHandler发送给FragmentIHome进行相应的显示。
  *        5.如下方法列表中4~10用于切换多个Fragment
+ *        
+ *        通过底部栏进行fragment切换的详细讲解：
+ *        1. 所有fragment都是BaseFragment的子类。getFragment()用于通过Basement获得相应的子fragment,所以在Basement的
+ *           newInstance方法中需要编写相应代码。具体内容看一下ClientMainActivity的getFragment方法和Basement的newInstance
+ *           方法内容就可以明白了。具体请咨询qq975559549
  *       
  * @Function List:
  *      1. void onCreate 		//判断当前的工作模式,动态注册广播接收器
@@ -77,6 +84,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 	private FragmentManager fragmentManager = null;
 	private FragmentTransaction fragmentTransaction = null;
 	FragmentIHome fragmentIHome;
+	FragmentVideo fragmentVideo;
 
 	private String account;
 
@@ -120,7 +128,8 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		initUI();
 		
 		fragmentManager = getFragmentManager();
-		setDefaultFirstFragment(Constant.FRAGMENT_FLAG_IHOME);
+		setDefaultFirstFragment(Constant.FRAGMENT_FLAG_VIDEO);
+		//setDefaultFirstFragment(Constant.FRAGMENT_FLAG_IHOME);
 		
 		Intent intent = getIntent();
 		int mode = intent.getIntExtra("mode", 2); //得到模式信息，默认为蓝牙模式2
@@ -179,6 +188,12 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 	{
 		communicationHandler = handler;
 	}
+	//接收器,更新温度等数据信息,显示连接和认证信息
+	/**
+	 * @Function: private class ContrlReceiver extends BroadcastReceiver
+	 * @Description:
+	 *      接受来自Service的信息，并且转发给相应fragment来改变相应组件内容
+	 **/
 	private class ContrlReceiver extends BroadcastReceiver{
 
 		public ContrlReceiver() {
@@ -258,6 +273,11 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				communicationHandler.sendMessage(msgMessage);
 				Toast.makeText(ClientMainActivity.this, modeString, Toast.LENGTH_SHORT).show();
 			}
+			else if(typeString.equals("video"))
+			{
+				String IDString = intent.getStringExtra("video");
+				Toast.makeText(ClientMainActivity.this, IDString, Toast.LENGTH_SHORT).show();
+			}
 
 		}
 		
@@ -310,18 +330,18 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 	public  void setTabSelection(String tag) {
 		// 开启一个Fragment事务
 		fragmentTransaction = fragmentManager.beginTransaction();
-		 if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_IHOME)){
+		if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_IHOME)){
 		   if (fragmentIHome == null) {
 			   fragmentIHome = new FragmentIHome();
 			} 
 		 }
-/*			
-		}else if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_CONTACTS)){
-			if (contactsFragment == null) {
-				contactsFragment = new ContactsFragment();
+		else if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_VIDEO)){
+			if (fragmentVideo == null) {
+				fragmentVideo = new FragmentVideo();
 			} 
-			
-		}else if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_NEWS)){
+		}
+/*
+		else if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_NEWS)){
 			if (newsFragment == null) {
 				newsFragment = new NewsFragment();
 			}
@@ -336,7 +356,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 			} 
 			
 		}*/
-		 switchFragment(tag);
+		switchFragment(tag);
 		 
 	}
 	
@@ -377,18 +397,17 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 	}
 	
 	private void setDefaultFirstFragment(String tag){
-		Log.i("yan", "setDefaultFirstFragment enter... currFragTag = " + currFragTag);
+		//Log.i("yan", "setDefaultFirstFragment enter... currFragTag = " + currFragTag);
 		setTabSelection(tag);
 		bottomPanel.defaultBtnChecked();
-		Log.i("yan", "setDefaultFirstFragment exit...");
+		//Log.i("yan", "setDefaultFirstFragment exit...");
 	}
 	
 	
 	private FragmentTransaction ensureTransaction( ){
 		if(fragmentTransaction == null){
 			fragmentTransaction = fragmentManager.beginTransaction();
-			fragmentTransaction
-			.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+			fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 			
 		}
 		return fragmentTransaction;
@@ -400,7 +419,6 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		Fragment f = fragmentManager.findFragmentByTag(tag);
 		
 		if(f == null){
-			//Toast.makeText(getApplicationContext(), "fragment = null tag = " + tag, Toast.LENGTH_SHORT).show();
 			f = BaseFragment.newInstance(getApplicationContext(), tag);
 		}
 		return f;

@@ -1,4 +1,4 @@
-package ihome_client.bottombar;
+package com.feather.bottombar;
 
 import com.example.ihome_client.R;
 

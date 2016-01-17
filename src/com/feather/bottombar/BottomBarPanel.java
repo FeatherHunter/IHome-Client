@@ -1,4 +1,4 @@
-package ihome_client.bottombar;
+package com.feather.bottombar;
 
 import java.util.ArrayList;  
 import java.util.List;   
