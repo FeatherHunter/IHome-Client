@@ -49,6 +49,7 @@ import android.widget.Toast;
  * @History:
  *     v1.0  @date 2015/12/25 Service启动后，自动连接服务器，连接成功后，负责与服务器间通信。会自动短线重连
  *     v2.10 @date 2016/1/10  增加wifi内连接控制中心的功能，失败后尝试连接服务器。
+ *     v2.24 @date 2016/1/20  重做指令解析，修复若干小bug
  **/
 
 public class IHomeService extends Service{
@@ -73,8 +74,7 @@ public class IHomeService extends Service{
 	private boolean iswified   = false;  //是否wifi内连接控制中心成功
 	
 	private boolean stopallthread = false; //停止所有线程
-	byte buffer[] = new byte[2048]; //2048字节的指令缓冲区
-	byte videoBuffer[] = new byte[4096]; //4096的视频文件缓冲区
+	byte buffer[] = new byte[4096]; //4096字节的指令缓冲区
 	
 	private ServiceReceiver serviceReceiver;
 	private String SERVICE_ACTION = "android.intent.action.MAIN";
@@ -109,6 +109,7 @@ public class IHomeService extends Service{
 	public void onCreate() {
 		// TODO Auto-generated method stub
 		super.onCreate();
+		System.out.println("service's onCreate");
 		stopallthread = false; //允许所有线程
 		Thread thread = new Thread(serverConnectRunnable);//连接服务器
 		thread.start();	
@@ -200,7 +201,7 @@ public class IHomeService extends Service{
 				while((isConnected == true)&&(!accountReady)&&(isAuthed == true)) 
 				{
 					try {
-						Thread.sleep(1000);  //睡眠
+						Thread.sleep(500);  //睡眠
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -208,7 +209,6 @@ public class IHomeService extends Service{
 				}
 				if(accountReady && (isConnected == false))//身份确定并且没有连接
 				{
-					System.out.println("accountReady is true");
 					/*正在重新连接*/
 					Intent intent = new Intent();
 					intent.setAction(intent.ACTION_EDIT);
@@ -554,6 +554,7 @@ public class IHomeService extends Service{
 				}
 				if(isTestWifi == true)//正在测试wifi能否连接到stm32
 				{
+					System.out.println("wwwwwwwwwwwwwwwwwwwwwwwwwfifififififififififififif");
 					try {
 						Thread.sleep(1000);//先休眠一秒
 					} catch (InterruptedException e) {
@@ -564,6 +565,7 @@ public class IHomeService extends Service{
 				}
 				while(isConnected == false)//断开连接，先等待重新链接
 				{
+					System.out.println("rev msg runnable is sleeepiiiiiiiiiiiiiiiiiiing");
 					try {
 						Thread.sleep(1000);//先休眠一秒等待链接
 					} catch (InterruptedException e) {
@@ -573,18 +575,23 @@ public class IHomeService extends Service{
 				}
 				try {
 
+					System.out.println("rev msg runnable is runnnnnnnnnnnnnnnnnnning");
+
 					/*得到服务器返回信息*/
 					int temp = inputStream.read(buffer);
 					if(temp < 0)
 					{
-						throw new Exception("断开连接");
+						if(temp == -1)
+						{
+							System.out.println("temo -1");
+							continue;
+						}
+						else
+						{
+							System.out.println("断开连接");
+							throw new Exception("断开连接");
+						}
 					}
-//					Intent tempintent = new Intent();
-//					tempintent.setAction(tempintent.ACTION_EDIT);
-//					/*返回ihome模式开启情况*/
-//					tempintent.putExtra("type", "video");
-//					tempintent.putExtra("video", "read:"+temp);
-//					sendBroadcast(tempintent);
 					//先复制到处理的缓冲区中
 					System.arraycopy(buffer    ,0, handleBuffer, bufferEnd, temp);
 					bufferEnd += temp;
@@ -607,7 +614,7 @@ public class IHomeService extends Service{
 							}
 							else //正常结束
 							{
-								System.out.println("normal end msg");
+								System.out.println("正常到指令末尾");
 								bufferEnd = 0; //清空缓冲区
 								break;
 							}
@@ -621,13 +628,9 @@ public class IHomeService extends Service{
 							if(type == Instruction.COMMAND_PULSE)
 							{
 								i++;
-								System.out.println("pulse");
 								continue;
 							}
-							else if(type == Instruction.COMMAND_VIDEO)
-							{
-								System.out.println("===========================================COMMAND_VIDEO=======================================");
-							}
+
 						}
 						else {
 							/*当前指令错误则跳转到下一个指令*/
@@ -657,7 +660,7 @@ public class IHomeService extends Service{
 						}
 						i++;
 						accountString = new String(handleBuffer, start, end - start); //字符串长度end - start
-						System.out.println("account:"+accountString);
+						//System.out.println("account:"+accountString);
 							/*确定来自于自己的控制中心或者SERVER*/
 						if(!accountString.equals(account+'h')&&!accountString.equals("SERVER"))
 						{
@@ -670,67 +673,70 @@ public class IHomeService extends Service{
 							i++;
 							continue;
 						}
-						System.out.println("account check success");
+						//System.out.println("account check success");
 					   /*-------------------先处理视频指令------------------------*/
 						if(type == Instruction.COMMAND_VIDEO)
 						{
-							System.out.println("video COMMAND_VIDEO");
+							System.out.println("COMMAND_VIDEO magstart :  " + msgStart + "  i: " + i);
 							/*获得摄像头ID*/
-							for(start = i, end = start; (end<handleBuffer.length)&&((handleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+							for(start = i, end = start; (end<bufferEnd)&&((handleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 							{
 								;
 							}
 							i++;
-							cameraIDString = new String(handleBuffer, start, end - start);
+							cameraIDString = new String(handleBuffer, start, end - start); //end - start 重点注意！
 							if(cameraIDString.equals(cameraIDString))//确定为需要的视频ID：20000
 							{
-								subtype = handleBuffer[i];
-								if(subtype == Instruction.VIDEO_START)//视频流开始
+								if((i + 1 < bufferEnd)&&(handleBuffer[i+1]==Instruction.COMMAND_SEPERATOR))
 								{
-									System.out.println("video start");
-									i += 2;
-									try {
-										jpegOutputStream = new FileOutputStream("mnt/sdcard/camera.jpg");
-									} catch (Exception e) {
-										// TODO: handle exception
-										e.printStackTrace();
-									}
-									Intent intent = new Intent();
-									intent.setAction(intent.ACTION_EDIT);
-									/*返回ihome模式开启情况*/
-									intent.putExtra("type", "video");
-									intent.putExtra("video", "video start");
-									sendBroadcast(intent);
-									msgStart = i;
-
-								}//end of video_start
-								else if(subtype == Instruction.VIDEO_STOP)//数据流结束
-								{
-									System.out.println("video stop");
-									i += 2;
-
-									Intent intent = new Intent();
-									intent.setAction(intent.ACTION_EDIT);
-									/*返回ihome模式开启情况*/
-									intent.putExtra("type", "video");
-									intent.putExtra("video", "video stop");
-									sendBroadcast(intent);
-
-									if(jpegOutputStream != null)
+									subtype = handleBuffer[i];
+									if(subtype == Instruction.VIDEO_START)//视频流开始
 									{
+										//System.out.println("video start");
+										i += 3;
 										try {
-											jpegOutputStream.close();//关闭输出流
+											jpegOutputStream = new FileOutputStream("mnt/sdcard/camera.jpg");
 										} catch (Exception e) {
 											// TODO: handle exception
 											e.printStackTrace();
 										}
-									}
-									msgStart = i;
-								}//end of video stop
+//									Intent intent = new Intent();
+//									intent.setAction(intent.ACTION_EDIT);
+//									/*返回ihome模式开启情况*/
+//									intent.putExtra("type", "video");
+//									intent.putExtra("video", "video start");
+//									sendBroadcast(intent);
+										msgStart = i;
+
+									}//end of video_start
+									else if(subtype == Instruction.VIDEO_STOP)//数据流结束
+									{
+										//System.out.println("video stop");
+										i += 3;
+
+//									Intent intent = new Intent();
+//									intent.setAction(intent.ACTION_EDIT);
+//									/*返回ihome模式开启情况*/
+//									intent.putExtra("type", "video");
+//									intent.putExtra("video", "video stop");
+//									sendBroadcast(intent);
+
+										if(jpegOutputStream != null)
+										{
+											try {
+												jpegOutputStream.close();//关闭输出流
+											} catch (Exception e) {
+												// TODO: handle exception
+												e.printStackTrace();
+											}
+										}
+										msgStart = i;
+									}//end of video stop
+								}
 								else {
-									System.out.println("video data====================================");
+									//System.out.println("video data====================================");
 									/*获得数据长度*/
-									for(start = i, end = start; (end<handleBuffer.length)&&((handleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+									for(start = i, end = start; (end<bufferEnd)&&((handleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 									{
 										;
 									}
@@ -740,25 +746,27 @@ public class IHomeService extends Service{
 									dataLength = Integer.valueOf(dataLengthString);
 									//说明为数据
 
-									if(i + dataLength <= handleBuffer.length)//收到所有的数据
+									if(i + dataLength <= bufferEnd)//收到所有的数据
 									{
 										try {
-											jpegOutputStream.write(handleBuffer, i, i + dataLength);
-											Intent intent = new Intent();
-											intent.setAction(intent.ACTION_EDIT);
-											/*返回ihome模式开启情况*/
-											intent.putExtra("type", "video");
-											intent.putExtra("video", dataLength+" ");
-											sendBroadcast(intent);
+											jpegOutputStream.write(handleBuffer, i, dataLength);
+//											Intent intent = new Intent();
+//											intent.setAction(intent.ACTION_EDIT);
+//											intent.putExtra("type", "video");
+//											intent.putExtra("video", dataLength+" ");
+//											sendBroadcast(intent);
 										} catch (Exception e) {
 											// TODO: handle exception
 											e.printStackTrace();
 										}
 									}
 									else {//没有受到所有数据
+										System.out.println("没有接收到正常长度的数据");
+										i = bufferEnd; //直接跳转到结尾结束处理
 										continue; //等待接收好下一个指令再作打算
 									}
 									i += dataLength;
+									//System.out.println("datalength: "+ dataLength + " i :" + i);
 									msgStart = i; //正常完成处理
 								}//end of 是数据
 								continue;
@@ -820,7 +828,7 @@ public class IHomeService extends Service{
 							}//end of res_ihome
 							else if(subtype == Instruction.RES_LOGIN)
 							{
-								System.out.println("MAN_LOGIN");
+								//System.out.println("MAN_LOGIN");
 								if((i + 1 < bufferEnd)&&(handleBuffer[i+1]==Instruction.COMMAND_SEPERATOR))
 								{
 									subtype = handleBuffer[i];
@@ -883,7 +891,7 @@ public class IHomeService extends Service{
 								/*灯的状态*/
 							else if(subtype == Instruction.RES_LAMP)
 							{
-								System.out.println("res_lamp");
+								//System.out.println("res_lamp");
 								Intent intent = new Intent();
 								intent.setAction(intent.ACTION_EDIT);
 									/*获得灯的状态*/
@@ -1012,27 +1020,29 @@ public class IHomeService extends Service{
 						}
 
 					}//end of while(i < bufferEnd) 处理多组信息
+					System.out.println("处理完一组信息");
 						
 					
 				} catch (UnknownHostException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					
-					isConnected = false; //断开连接
-					isAuthed = false;    //认证失效
+					//isConnected = false; //断开连接
+					//isAuthed = false;    //认证失效
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					
-					isConnected = false; //断开连接
-					isAuthed = false;    //认证失效
+					//isConnected = false; //断开连接
+					//isAuthed = false;    //认证失效
 				} catch (Exception e) {
 					// TODO: handle exception
 					e.printStackTrace();			
-					isConnected = false; //断开连接
-					isAuthed = false;    //认证失效
+					//isConnected = false; //断开连接
+					//isAuthed = false;    //认证失效
 				}
 			}
+			System.out.println("跳出了while循环");
 			
 		}
 		

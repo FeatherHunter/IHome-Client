@@ -6,17 +6,17 @@
   
 
     <ImageView 
-           android:id="@+id/camera_jpg"
-           android:layout_width="200dip"
-           android:layout_height="200dip"
+        android:id="@+id/camera_jpg"
+        android:layout_width="340dip"
+        android:layout_height="340dip"
         	/>
     
     <Button
-           android:id="@+id/video_button"
-           android:layout_below="@id/camera_jpg"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="Video"/>
+        android:id="@+id/video_button"
+        android:layout_below="@id/camera_jpg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Video"/>
  
     
 </RelativeLayout>
