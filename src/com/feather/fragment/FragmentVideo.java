@@ -42,10 +42,10 @@ public class FragmentVideo extends BaseFragment{
 	public void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		/*ÒªÔÚonCreateViewÖ®ºóµÃµ½¿Õ¼ä²ÅÊÇÓĞĞ§µÄ*/
+		/*è¦åœ¨onCreateViewä¹‹åå¾—åˆ°ç©ºé—´æ‰æ˜¯æœ‰æ•ˆçš„*/
 		video_button = (Button) getActivity().findViewById(R.id.video_button);
 		cameraiImageView = (ImageView) getActivity().findViewById(R.id.camera_jpg);
-		/*ÉèÖÃ¼àÌıÆ÷*/
+		/*è®¾ç½®ç›‘å¬å™¨*/
 		video_button.setOnClickListener(new ButtonListener());
 	}
 
@@ -61,7 +61,7 @@ public class FragmentVideo extends BaseFragment{
 
 		@Override
 		public void onClick(View view) {
-			/*ĞèÒª·¢ËÍµÄÖ¸Áî,byteÊı×é*/
+			/*éœ€è¦å‘é€çš„æŒ‡ä»¤,byteæ•°ç»„*/
 			try {
 				 String path = "mnt/sdcard/camera.jpg";
 				 File file = new File(path);  
@@ -75,7 +75,7 @@ public class FragmentVideo extends BaseFragment{
 	                   Toast.makeText(getActivity(), "file readme.txt not found", Toast.LENGTH_SHORT).show();
 	              }  
 	               
-				/*ĞèÒª·¢ËÍµÄÖ¸Áî,byteÊı×é*/
+				/*éœ€è¦å‘é€çš„æŒ‡ä»¤,byteæ•°ç»„*/
 				String IDString = "20000";
 				byte typeBytes[] = {Instruction.COMMAND_CONTRL,Instruction.COMMAND_SEPERATOR};
 				byte subtypeBytes[] = {Instruction.COMMAND_SEPERATOR,Instruction.CTL_VIDEO, Instruction.COMMAND_SEPERATOR};
@@ -85,7 +85,7 @@ public class FragmentVideo extends BaseFragment{
 				byte buffer[] = new byte[subtypeBytes.length+operatorBytes.length
 				                       +IDBytes.length+endBytes.length];
 				
-				/*×ª»»accountºóÃæËùÓĞÖ¸Áî*/
+				/*è½¬æ¢accountåé¢æ‰€æœ‰æŒ‡ä»¤*/
 				int start = 0;
 				System.arraycopy(subtypeBytes ,0,buffer,start, subtypeBytes.length);
 				start+=subtypeBytes.length;
@@ -95,7 +95,7 @@ public class FragmentVideo extends BaseFragment{
 				start+=IDBytes.length;
 				System.arraycopy(endBytes   ,0,buffer,start, endBytes.length);
 				
-				/*·¢ËÍ¹ã²¥¸øService£¬ÈÃÆä·¢ËÍĞÅÏ¢¸ø·şÎñÆ÷*/
+				/*å‘é€å¹¿æ’­ç»™Serviceï¼Œè®©å…¶å‘é€ä¿¡æ¯ç»™æœåŠ¡å™¨*/
 				Intent intent = new Intent();
 				intent.putExtra("type", "send");
 				intent.putExtra("onefield", typeBytes);

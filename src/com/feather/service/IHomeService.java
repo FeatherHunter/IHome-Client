@@ -32,23 +32,23 @@ import android.os.IBinder;
 import android.widget.Toast;
 
 /**
- * @CopyRight: Íõ³½ºÆ 2015~2025
+ * @CopyRight: ç‹è¾°æµ© 2015~2025
  * @qq:975559549
- * @Author Feather Hunter(ÁÔÓğ)
+ * @Author Feather Hunter(çŒç¾½)
  * @Version:2.10
  * @Date:2016/1/10
- * @Description: ºóÌ¨service·şÎñ,ÓÃÓÚÓë·şÎñÆ÷Ö®¼äµÄÍ¨ĞÅ¡£Ö§³ÖwifiÄ£Ê½ºÍethernet
- *              ²¢½«ÊÕµ½µÄĞÅÏ¢¾­¹ı´¦Àíºó£¬¹ã²¥¸ø¸÷¸öactivity¡£
+ * @Description: åå°serviceæœåŠ¡,ç”¨äºä¸æœåŠ¡å™¨ä¹‹é—´çš„é€šä¿¡ã€‚æ”¯æŒwifiæ¨¡å¼å’Œethernet
+ *              å¹¶å°†æ”¶åˆ°çš„ä¿¡æ¯ç»è¿‡å¤„ç†åï¼Œå¹¿æ’­ç»™å„ä¸ªactivityã€‚
  * @Function list:
- *     1. int onStartCommand(Intent intent, int flags, int startId)//´¦ÀíÆäËûactivity·¢ËÍ¹ıÀ´µÄÊı¾İ
- *     2. authRunnable           //ÈÏÖ¤Ïß³Ì£¬·¢ËÍÉí·İĞÅÏ¢¸ø·şÎñÆ÷
- *     3. serverConnectRunnable  //Á¬½Ó·şÎñÆ÷µÄÏß³Ì
- *     4. allInfoFlushRunnable   //·¢ËÍÇëÇóÒÔµÃµ½ÎÂ¶ÈµÈËùÓĞ²ÎÊıµÄÊı¾İ
- *     5. revMsgRunnable         //ÎŞÏŞÑ­»·½ÓÊÕ·şÎñÆ÷·¢À´µÄĞÅÏ¢
- *     6. void onDestroy()       //¹Ø±Õsocket
+ *     1. int onStartCommand(Intent intent, int flags, int startId)//å¤„ç†å…¶ä»–activityå‘é€è¿‡æ¥çš„æ•°æ®
+ *     2. authRunnable           //è®¤è¯çº¿ç¨‹ï¼Œå‘é€èº«ä»½ä¿¡æ¯ç»™æœåŠ¡å™¨
+ *     3. serverConnectRunnable  //è¿æ¥æœåŠ¡å™¨çš„çº¿ç¨‹
+ *     4. allInfoFlushRunnable   //å‘é€è¯·æ±‚ä»¥å¾—åˆ°æ¸©åº¦ç­‰æ‰€æœ‰å‚æ•°çš„æ•°æ®
+ *     5. revMsgRunnable         //æ— é™å¾ªç¯æ¥æ”¶æœåŠ¡å™¨å‘æ¥çš„ä¿¡æ¯
+ *     6. void onDestroy()       //å…³é—­socket
  * @History:
- *     v1.0  @date 2015/12/25 ServiceÆô¶¯ºó£¬×Ô¶¯Á¬½Ó·şÎñÆ÷£¬Á¬½Ó³É¹¦ºó£¬¸ºÔğÓë·şÎñÆ÷¼äÍ¨ĞÅ¡£»á×Ô¶¯¶ÌÏßÖØÁ¬
- *     v2.10 @date 2016/1/10  Ôö¼ÓwifiÄÚÁ¬½Ó¿ØÖÆÖĞĞÄµÄ¹¦ÄÜ£¬Ê§°Üºó³¢ÊÔÁ¬½Ó·şÎñÆ÷¡£
+ *     v1.0  @date 2015/12/25 Serviceå¯åŠ¨åï¼Œè‡ªåŠ¨è¿æ¥æœåŠ¡å™¨ï¼Œè¿æ¥æˆåŠŸåï¼Œè´Ÿè´£ä¸æœåŠ¡å™¨é—´é€šä¿¡ã€‚ä¼šè‡ªåŠ¨çŸ­çº¿é‡è¿
+ *     v2.10 @date 2016/1/10  å¢åŠ wifiå†…è¿æ¥æ§åˆ¶ä¸­å¿ƒçš„åŠŸèƒ½ï¼Œå¤±è´¥åå°è¯•è¿æ¥æœåŠ¡å™¨ã€‚
  **/
 
 public class IHomeService extends Service{
@@ -57,37 +57,37 @@ public class IHomeService extends Service{
 	OutputStream outputStream; //ouput to server
 	InputStream inputStream;   //input from server
 	
-	/*ÊÓÆµ×¨ÓÃÁ¬½Ó*/
+	/*è§†é¢‘ä¸“ç”¨è¿æ¥*/
 	Socket videoSocket;
 	OutputStream videoOutputStream; //ouput to target
 	InputStream videoInputStream;   //input from target
 	
 	String account, password;
 	private int sleeptime = 100;
-	private boolean accountReady = false;  //ÊÇ·ñ»ñµÃÁËÃ÷È·µÄÓÃ»§ÕÊ»§ĞÅÏ¢ºÍÃÜÂë
+	private boolean accountReady = false;  //æ˜¯å¦è·å¾—äº†æ˜ç¡®çš„ç”¨æˆ·å¸æˆ·ä¿¡æ¯å’Œå¯†ç 
 	
-	public boolean isConnected = false;  //Í¨ÓÃÁ¬½Ó ÊÇ·ñÁ¬½Ó³É¹¦
+	public boolean isConnected = false;  //é€šç”¨è¿æ¥ æ˜¯å¦è¿æ¥æˆåŠŸ
 	public boolean videoIsConnected = false;
-	private boolean isAuthed   = false;  //ÊÇ·ñÑéÖ¤³É¹¦
-	private boolean isTestWifi = false;  //ÕıÔÚ²âÊÔwifiÄÚÄÜ·ñÁ¬½ÓÉÏ¿ØÖÆÖĞĞÄ£¬´ËÊ±Í£Ö¹TCP½ÓÊÜĞÅÏ¢Ïß³Ì
-	private boolean iswified   = false;  //ÊÇ·ñwifiÄÚÁ¬½Ó¿ØÖÆÖĞĞÄ³É¹¦
+	private boolean isAuthed   = false;  //æ˜¯å¦éªŒè¯æˆåŠŸ
+	private boolean isTestWifi = false;  //æ­£åœ¨æµ‹è¯•wifiå†…èƒ½å¦è¿æ¥ä¸Šæ§åˆ¶ä¸­å¿ƒï¼Œæ­¤æ—¶åœæ­¢TCPæ¥å—ä¿¡æ¯çº¿ç¨‹
+	private boolean iswified   = false;  //æ˜¯å¦wifiå†…è¿æ¥æ§åˆ¶ä¸­å¿ƒæˆåŠŸ
 	
-	private boolean stopallthread = false; //Í£Ö¹ËùÓĞÏß³Ì
-	byte buffer[] = new byte[2048]; //2048×Ö½ÚµÄÖ¸Áî»º³åÇø
-	byte videoBuffer[] = new byte[4096]; //4096µÄÊÓÆµÎÄ¼ş»º³åÇø
+	private boolean stopallthread = false; //åœæ­¢æ‰€æœ‰çº¿ç¨‹
+	byte buffer[] = new byte[2048]; //2048å­—èŠ‚çš„æŒ‡ä»¤ç¼“å†²åŒº
+	byte videoBuffer[] = new byte[4096]; //4096çš„è§†é¢‘æ–‡ä»¶ç¼“å†²åŒº
 	
 	private ServiceReceiver serviceReceiver;
 	private String SERVICE_ACTION = "android.intent.action.MAIN";
 	
 	private String serverString = "139.129.19.115";
-	private String contrlCenterString = "192.168.16.106";
+	private String contrlCenterString = "192.168.1.108";
 	private int generalPort = 8080;
-	private int videoPort   = 8081;
+	private int videoPort   = 9080;
 	private String cameraIDString = "20000";
 	
 	private FileOutputStream jpegOutputStream = null;
 	
-	/*wifiÄ£Ê½Ïà¹Ø*/
+	/*wifiæ¨¡å¼ç›¸å…³*/
 	private WifiManager wifiManager;
 	
 	@Override
@@ -99,44 +99,40 @@ public class IHomeService extends Service{
 	/**
 	 * @Function: public void onCreate();
 	 * @Description:
-	 *      1. ´´½¨Á¬½ÓÏß³Ì£ºÓÃÓÚwifiÄÚÖ±½ÓÁ¬½Ó¿ØÖÆÖĞĞÄ»òÕßÍ¨¹ıethernetÁ¬½Ó·şÎñÆ÷
-	 *      2. ´´½¨½ÓÊÜĞÅÏ¢Ïß³Ì£º ½ÓÊÜÄ¿±êµÄĞÅÏ¢
-	 *      3. ´´½¨¸üĞÂÎÂ¶ÈÊª¶ÈµÈÊı¾İµÄÏß³Ì£¬Í¬Ê±×÷ÎªĞÄÌøº¯Êı¡£
-	 *      4. ¶¯Ì¬×¢²áreceiver-½ÓÊÜÀ´×ÔÆäËûÄ£¿éµÄĞÅÏ¢£¬²¢½«Æä×ª·¢¸ø·şÎñÆ÷¡£
-	 *      5. »ñÈ¡wifimanager¹ÜÀíÆ÷¡£
+	 *      1. åˆ›å»ºè¿æ¥çº¿ç¨‹ï¼šç”¨äºwifiå†…ç›´æ¥è¿æ¥æ§åˆ¶ä¸­å¿ƒæˆ–è€…é€šè¿‡ethernetè¿æ¥æœåŠ¡å™¨
+	 *      2. åˆ›å»ºæ¥å—ä¿¡æ¯çº¿ç¨‹ï¼š æ¥å—ç›®æ ‡çš„ä¿¡æ¯
+	 *      3. åˆ›å»ºæ›´æ–°æ¸©åº¦æ¹¿åº¦ç­‰æ•°æ®çš„çº¿ç¨‹ï¼ŒåŒæ—¶ä½œä¸ºå¿ƒè·³å‡½æ•°ã€‚
+	 *      4. åŠ¨æ€æ³¨å†Œreceiver-æ¥å—æ¥è‡ªå…¶ä»–æ¨¡å—çš„ä¿¡æ¯ï¼Œå¹¶å°†å…¶è½¬å‘ç»™æœåŠ¡å™¨ã€‚
+	 *      5. è·å–wifimanagerç®¡ç†å™¨ã€‚
 	 **/
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
 		super.onCreate();
-		stopallthread = false; //ÔÊĞíËùÓĞÏß³Ì
-		Thread thread = new Thread(serverConnectRunnable);//Á¬½Ó·şÎñÆ÷
+		stopallthread = false; //å…è®¸æ‰€æœ‰çº¿ç¨‹
+		Thread thread = new Thread(serverConnectRunnable);//è¿æ¥æœåŠ¡å™¨
 		thread.start();	
-		/*¿ªÆô½ÓÊÜĞÅÏ¢µÄÏß³Ì*/
+		/*å¼€å¯æ¥å—ä¿¡æ¯çš„çº¿ç¨‹*/
 		thread = new Thread(revMsgRunnable);
-		thread.start();	
-		/*¿ªÆô¸üĞÂÊı¾İºÍĞÄÌø*/
+		thread.start();
+		/*å¼€å¯æ›´æ–°æ•°æ®å’Œå¿ƒè·³*/
 		//thread = new Thread(allInfoFlushRunnable);
 		//thread.start();
 		
-		/*¿ªÆô¸üĞÂÊı¾İºÍĞÄÌø*/
-		thread = new Thread(videoConnectRunnable);
-		thread.start();
-		
-		/*¶¯Ì¬×¢²áreceiver*/
+		/*åŠ¨æ€æ³¨å†Œreceiver*/
 		serviceReceiver = new ServiceReceiver();
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(SERVICE_ACTION);
-		registerReceiver(serviceReceiver, filter);//×¢²á
+		registerReceiver(serviceReceiver, filter);//æ³¨å†Œ
 		
-		/*wifiÏà¹Ø*/
-		wifiManager = (WifiManager) getSystemService(Service.WIFI_SERVICE);//»ñµÃwifi
+		/*wifiç›¸å…³*/
+		wifiManager = (WifiManager) getSystemService(Service.WIFI_SERVICE);//è·å¾—wifi
 	}
 
 	/**
 	 * @Function: int onStartCommand();
 	 * @Description:
-	 *      1. ÓÃÓÚ½ÓÊÜµÇÂ½½çÃæ·¢ËÍÀ´µÄÕËºÅºÍÃÜÂëĞÅÏ¢ÓÃÓÚµÇÂ¼¡£
+	 *      1. ç”¨äºæ¥å—ç™»é™†ç•Œé¢å‘é€æ¥çš„è´¦å·å’Œå¯†ç ä¿¡æ¯ç”¨äºç™»å½•ã€‚
 	 **/
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -148,9 +144,9 @@ public class IHomeService extends Service{
 			{
 				account = intent.getStringExtra("account");
 				password = intent.getStringExtra("password");
-				accountReady = true; //ÓÃ»§ĞÅÏ¢×¼±¸ºÃÁË
+				accountReady = true; //ç”¨æˆ·ä¿¡æ¯å‡†å¤‡å¥½äº†
 			}
-			/*Í£Ö¹ËùÓĞÏß³Ì*/
+			/*åœæ­¢æ‰€æœ‰çº¿ç¨‹*/
 			else if(commandString.equals("stop"))
 			{
 				stopallthread = true;
@@ -163,9 +159,9 @@ public class IHomeService extends Service{
 	/**
 	 * @Function: void onDestroy();
 	 * @Description:
-	 *      ÓÃÓÚÏú»ÙServiceÊ±ºòµÄÊÕÎ²¹¤×÷¡£
-	 *      1. ¹Ø±Õsocket
-	 *      2. ½â³ı¶¯Ì¬×¢²áµÄReceiver 
+	 *      ç”¨äºé”€æ¯Serviceæ—¶å€™çš„æ”¶å°¾å·¥ä½œã€‚
+	 *      1. å…³é—­socket
+	 *      2. è§£é™¤åŠ¨æ€æ³¨å†Œçš„Receiver 
 	 **/
 	@Override
 	public void onDestroy() {
@@ -174,21 +170,21 @@ public class IHomeService extends Service{
 		if(serverSocket != null)
 		{
 			try {
-				serverSocket.close(); //¹Ø±Õsocket
+				serverSocket.close(); //å…³é—­socket
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		unregisterReceiver(serviceReceiver); //½â³ıReceiver
+		unregisterReceiver(serviceReceiver); //è§£é™¤Receiver
 	}
 
 	/**
 	 * @Function: serverConnectRunnable;
 	 * @Description:
-	 *      ÓÃÓÚÁ¬½Ó·şÎñÆ÷»òÕß¿ØÖÆÖĞĞÄ£¬²¢ÇÒ¶ÏÏßµÄÊ±ºòÖØĞÂÁ¬½Ó¡£
-	 *      1. ¹Ø±Õsocket
-	 *      2. ½â³ı¶¯Ì¬×¢²áµÄReceiver 
+	 *      ç”¨äºè¿æ¥æœåŠ¡å™¨æˆ–è€…æ§åˆ¶ä¸­å¿ƒï¼Œå¹¶ä¸”æ–­çº¿çš„æ—¶å€™é‡æ–°è¿æ¥ã€‚
+	 *      1. å…³é—­socket
+	 *      2. è§£é™¤åŠ¨æ€æ³¨å†Œçš„Receiver 
 	 **/
 	Runnable serverConnectRunnable = new Runnable() {
 		@Override
@@ -200,27 +196,27 @@ public class IHomeService extends Service{
 				{
 					break;
 				}
-				/*tcpÁ¬½Ó³É¹¦,ÓÃ»§ĞÅÏ¢Ã»ÓĞ×¼±¸ºÃ,ÈÏÖ¤³É¹¦---²»Âú×ãÆäÖĞÒ»ÏîÔò½øĞĞ´¦Àí*/
+				/*tcpè¿æ¥æˆåŠŸ,ç”¨æˆ·ä¿¡æ¯æ²¡æœ‰å‡†å¤‡å¥½,è®¤è¯æˆåŠŸ---ä¸æ»¡è¶³å…¶ä¸­ä¸€é¡¹åˆ™è¿›è¡Œå¤„ç†*/
 				while((isConnected == true)&&(!accountReady)&&(isAuthed == true)) 
 				{
 					try {
-						Thread.sleep(1000);  //Ë¯Ãß
+						Thread.sleep(1000);  //ç¡çœ 
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-				if(accountReady && (isConnected == false))//Éí·İÈ·¶¨²¢ÇÒÃ»ÓĞÁ¬½Ó
+				if(accountReady && (isConnected == false))//èº«ä»½ç¡®å®šå¹¶ä¸”æ²¡æœ‰è¿æ¥
 				{
 					System.out.println("accountReady is true");
-					/*ÕıÔÚÖØĞÂÁ¬½Ó*/
+					/*æ­£åœ¨é‡æ–°è¿æ¥*/
 					Intent intent = new Intent();
 					intent.setAction(intent.ACTION_EDIT);
 					intent.putExtra("type", "disconnect");
 					intent.putExtra("disconnect", "connecting");
 					sendBroadcast(intent);
 					
-					/*Ö®Ç°ÓĞ¹ısocketÁ¬½Ó,ÏÈ¹Ø±Õ£¬ÔÙ¿ªÆôĞÂµÄ*/
+					/*ä¹‹å‰æœ‰è¿‡socketè¿æ¥,å…ˆå…³é—­ï¼Œå†å¼€å¯æ–°çš„*/
 					if(serverSocket != null)
 					{
 						try {
@@ -232,8 +228,8 @@ public class IHomeService extends Service{
 					}
 					isTestWifi = true;
 					iswified = false;
-					/*¼ì²âÊÇ·ñÔÚwifiÄÚÄÜÁ¬½Óµ½ÓÃ»§*/
-					if(wifiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED)//wifiÒÑ¾­´ò¿ª
+					/*æ£€æµ‹æ˜¯å¦åœ¨wifiå†…èƒ½è¿æ¥åˆ°ç”¨æˆ·*/
+					if(wifiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED)//wifiå·²ç»æ‰“å¼€
 					{
 						SocketChannel socketChannel = null;
 						try {
@@ -241,7 +237,7 @@ public class IHomeService extends Service{
 							socketChannel.configureBlocking(false);
 							socketChannel.connect(new InetSocketAddress(contrlCenterString, 8080));
 							
-							Thread.sleep(1000);  //Ë¯Ãß500ms
+							Thread.sleep(1000);  //ç¡çœ 500ms
 							if(!socketChannel.finishConnect())
 							{
 								iswified = false;
@@ -257,7 +253,7 @@ public class IHomeService extends Service{
 							e.printStackTrace();
 						}finally{
 							try {
-								if(socketChannel != null)//¹Ø±Õ
+								if(socketChannel != null)//å…³é—­
 									socketChannel.close();
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
@@ -268,15 +264,15 @@ public class IHomeService extends Service{
 					isTestWifi = false;
 					if(iswified == true)
 					{
-						/*¶Ï¿ªÁ¬½Óºó,ÖØĞÂÁ¬½ÓºÍÉí·İÈÏÖ¤*/
+						/*æ–­å¼€è¿æ¥å,é‡æ–°è¿æ¥å’Œèº«ä»½è®¤è¯*/
 						try {
 							serverSocket = new Socket(contrlCenterString, 8080);
-							/*µÃµ½ÊäÈëÁ÷¡¢Êä³öÁ÷*/
+							/*å¾—åˆ°è¾“å…¥æµã€è¾“å‡ºæµ*/
 							outputStream = serverSocket.getOutputStream();
 							inputStream = serverSocket.getInputStream();
-							isConnected = true; //ßB½Ó³É¹¦
+							isConnected = true; //é€£æ¥æˆåŠŸ
 							
-							/*¸æËßactivityÖØĞÂÁ¬½Ó³É¹¦*/
+							/*å‘Šè¯‰activityé‡æ–°è¿æ¥æˆåŠŸ*/
 							intent.setAction(intent.ACTION_EDIT);
 							intent.putExtra("type", "disconnect");
 							intent.putExtra("disconnect", "connected");
@@ -284,9 +280,9 @@ public class IHomeService extends Service{
 						} catch (UnknownHostException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-							isConnected = false; //ßB½ÓÊ§”¡
+							isConnected = false; //é€£æ¥å¤±æ•—
 							try {
-								Thread.sleep(2500);  //Ê§°ÜºóµÈ´ı3sÁ¬½Ó
+								Thread.sleep(2500);  //å¤±è´¥åç­‰å¾…3sè¿æ¥
 							} catch (InterruptedException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
@@ -294,25 +290,26 @@ public class IHomeService extends Service{
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-							isConnected = false; //Á¬½ÓÊ§°Ü
+							isConnected = false; //è¿æ¥å¤±è´¥
 							try {
-								Thread.sleep(2500);  //Ê§°ÜºóµÈ´ı3sÁ¬½Ó
+								Thread.sleep(2500);  //å¤±è´¥åç­‰å¾…3sè¿æ¥
 							} catch (InterruptedException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
-						}	 
+						}
+
 					}//end of connecting ContrlCenter
 					else {
-						/*¶Ï¿ªÁ¬½Óºó,ÖØĞÂÁ¬½ÓºÍÉí·İÈÏÖ¤*/
+						/*æ–­å¼€è¿æ¥å,é‡æ–°è¿æ¥å’Œèº«ä»½è®¤è¯*/
 						try {
 							serverSocket = new Socket(serverString, 8080);
-							/*µÃµ½ÊäÈëÁ÷¡¢Êä³öÁ÷*/
+							/*å¾—åˆ°è¾“å…¥æµã€è¾“å‡ºæµ*/
 							outputStream = serverSocket.getOutputStream();
 							inputStream = serverSocket.getInputStream();
-							isConnected = true; //ßB½Ó³É¹¦
+							isConnected = true; //é€£æ¥æˆåŠŸ
 							
-							/*¸æËßactivityÖØĞÂÁ¬½Ó³É¹¦*/
+							/*å‘Šè¯‰activityé‡æ–°è¿æ¥æˆåŠŸ*/
 							intent.setAction(intent.ACTION_EDIT);
 							intent.putExtra("type", "disconnect");
 							intent.putExtra("disconnect", "connected");
@@ -320,9 +317,9 @@ public class IHomeService extends Service{
 						} catch (UnknownHostException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-							isConnected = false; //ßB½ÓÊ§”¡
+							isConnected = false; //é€£æ¥å¤±æ•—
 							try {
-								Thread.sleep(2500);  //Ê§°ÜºóµÈ´ı3sÁ¬½Ó
+								Thread.sleep(2500);  //å¤±è´¥åç­‰å¾…3sè¿æ¥
 							} catch (InterruptedException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
@@ -330,9 +327,9 @@ public class IHomeService extends Service{
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-							isConnected = false; //Á¬½ÓÊ§°Ü
+							isConnected = false; //è¿æ¥å¤±è´¥
 							try {
-								Thread.sleep(2500);  //Ê§°ÜºóµÈ´ı3sÁ¬½Ó
+								Thread.sleep(2500);  //å¤±è´¥åç­‰å¾…3sè¿æ¥
 							} catch (InterruptedException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
@@ -341,20 +338,20 @@ public class IHomeService extends Service{
 						
 					}//end of connecting server
 				}
-				/*ÔÚÁ¬½Ó³É¹¦ºÍÓÃ»§Éí·İÈ·¶¨µÄÊ±ºò£¬½øĞĞÉí·İÈÏÖ¤*/
+				/*åœ¨è¿æ¥æˆåŠŸå’Œç”¨æˆ·èº«ä»½ç¡®å®šçš„æ—¶å€™ï¼Œè¿›è¡Œèº«ä»½è®¤è¯*/
 				if(isConnected && accountReady && (isAuthed == false))
 				{
-					/*Í¨ÖªactivityÕıÔÚÑéÖ¤ĞÅÏ¢*/
+					/*é€šçŸ¥activityæ­£åœ¨éªŒè¯ä¿¡æ¯*/
 					Intent intent = new Intent();
 					intent.setAction(intent.ACTION_EDIT);
 					intent.putExtra("type", "disconnect");
 					intent.putExtra("disconnect", "authing");
 					sendBroadcast(intent);
-					/*ÓÃ»§Éí·İÑéÖ¤ÇëÇó*/
+					/*ç”¨æˆ·èº«ä»½éªŒè¯è¯·æ±‚*/
 					try {
-						/*ĞèÒª·¢ËÍµÄÖ¸Áî,byteÊı×é*/
+						/*éœ€è¦å‘é€çš„æŒ‡ä»¤,byteæ•°ç»„*/
 						byte typeBytes[] = {Instruction.COMMAND_MANAGE,Instruction.COMMAND_SEPERATOR};
-						byte accountBytes[] = account.getBytes("UTF-8");//µÃµ½±ê×¼µÄUTF-8±àÂë
+						byte accountBytes[] = account.getBytes("UTF-8");//å¾—åˆ°æ ‡å‡†çš„UTF-8ç¼–ç 
 						byte twoBytes[] = {Instruction.COMMAND_SEPERATOR,Instruction.MAN_LOGIN, Instruction.COMMAND_SEPERATOR};
 						byte passwordBytes[] = password.getBytes("UTF-8");
 						byte threeBytes[] = {Instruction.COMMAND_SEPERATOR, Instruction.COMMAND_END};						
@@ -378,10 +375,10 @@ public class IHomeService extends Service{
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-							isConnected = false; //Á¬½ÓÊ§°Ü
-							isAuthed = false;    //ÈÏÖ¤Ê§Ğ§
+							isConnected = false; //è¿æ¥å¤±è´¥
+							isAuthed = false;    //è®¤è¯å¤±æ•ˆ
 							try {
-								Thread.sleep(2500);  //Éí·İÑéÖ¤Ê§°ÜºóµÈ´ı3s
+								Thread.sleep(2500);  //èº«ä»½éªŒè¯å¤±è´¥åç­‰å¾…3s
 							} catch (InterruptedException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
@@ -393,149 +390,22 @@ public class IHomeService extends Service{
 					}
 					
 					try {
-						Thread.sleep(1000);  //Éí·İÑéÖ¤Ê§°ÜºóµÈ´ı1s
+						Thread.sleep(1000);  //èº«ä»½éªŒè¯å¤±è´¥åç­‰å¾…1s
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					
-				}//end of Éí·İÈÏÖ¤
+				}//end of èº«ä»½è®¤è¯
 
 			}
 			
 		}
 	};
 	
-	/**
-	 * @Function: videoConnectRunnable;
-	 * @Description:
-	 *      ÊÓÆµ×¨ÓÃÁ¬½Ó£¬ÓÃÓÚ½ÓÊÜÊÓÆµĞÅÏ¢
-	 */
-	Runnable videoConnectRunnable = new Runnable() {
-		
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			while(true)
-			{
-				if(stopallthread)
-				{
-					break;
-				}
-				/*Ö¸Áî×¨ÓÃÁ´½ÓÈÏÖ¤²»³É¹¦£¬ÔòÊÓÆµµÄÒ²²»»á³É¹¦£¬µÈ´ı*/
-				while(!isAuthed) 
-				{
-					try {
-						Thread.sleep(1000);  //Ë¯Ãß
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				if((isAuthed == true)&&(videoIsConnected == false))
-				{
-					/*ÕıÔÚÖØĞÂÁ¬½Ó*/
-					Intent intent = new Intent();
-					intent.setAction(intent.ACTION_EDIT);
-					intent.putExtra("type", "disconnect");
-					intent.putExtra("disconnect", "ÊÓÆµÁ¬½ÓÖĞ...");
-					sendBroadcast(intent);
-					
-					/*Ö®Ç°ÓĞ¹ısocketÁ¬½Ó,ÏÈ¹Ø±Õ£¬ÔÙ¿ªÆôĞÂµÄ*/
-					if(videoSocket != null)
-					{
-						try {
-							videoSocket.close();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-					if(iswified == true)
-					{
-						/*¶Ï¿ªÁ¬½Óºó,ÖØĞÂÁ¬½Ó*/
-						try {
-							videoSocket = new Socket(contrlCenterString, videoPort);
-							/*µÃµ½ÊäÈëÁ÷¡¢Êä³öÁ÷*/
-							videoOutputStream = videoSocket.getOutputStream();
-							videoInputStream = videoSocket.getInputStream();
-							videoIsConnected = true; //ÊÓÆµßB½Ó³É¹¦
-							
-							/*¸æËßactivityÖØĞÂÁ¬½Ó³É¹¦*/
-							intent.setAction(intent.ACTION_EDIT);
-							intent.putExtra("type", "disconnect");
-							intent.putExtra("disconnect", "ÊÓÆµÁ¬½Ó³É¹¦");
-							sendBroadcast(intent);
-						} catch (UnknownHostException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							videoIsConnected = false; //ßB½ÓÊ§”¡
-							try {
-								Thread.sleep(2500);  //Ê§°ÜºóµÈ´ı3sÁ¬½Ó
-							} catch (InterruptedException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							videoIsConnected = false; //Á¬½ÓÊ§°Ü
-							try {
-								Thread.sleep(2500);  //Ê§°ÜºóµÈ´ı3sÁ¬½Ó
-							} catch (InterruptedException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						}	 
-					}//end of connecting ContrlCenter
-					else {
-						/*¶Ï¿ªÁ¬½Óºó,ÖØĞÂÁ¬½Ó*/
-						try {
-							videoSocket = new Socket(serverString, videoPort);
-							/*µÃµ½ÊäÈëÁ÷¡¢Êä³öÁ÷*/
-							videoOutputStream = videoSocket.getOutputStream();
-							videoInputStream = videoSocket.getInputStream();
-							videoIsConnected = true; //ÊÓÆµßB½Ó³É¹¦
-							
-							/*¸æËßactivityÖØĞÂÁ¬½Ó³É¹¦*/
-							intent.setAction(intent.ACTION_EDIT);
-							intent.putExtra("type", "disconnect");
-							intent.putExtra("disconnect", "ÊÓÆµÁ¬½Ó³É¹¦");
-							sendBroadcast(intent);
-						} catch (UnknownHostException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							videoIsConnected = false; //ßB½ÓÊ§”¡
-							try {
-								Thread.sleep(2500);  //Ê§°ÜºóµÈ´ı3sÁ¬½Ó
-							} catch (InterruptedException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							videoIsConnected = false; //Á¬½ÓÊ§°Ü
-							try {
-								Thread.sleep(2500);  //Ê§°ÜºóµÈ´ı3sÁ¬½Ó
-							} catch (InterruptedException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						}	
-						
-					}//end of connecting video
-				}//end of isAuthed true and videoIsConnected false
-
-			}//end of while(1)
-			
-		}//end of run
-	
-	};
-	
 	
 	/**
-	 * @Description:ÓÃÓÚ¶¨Ê±µÃµ½ÎÂ¶È,Êª¶È,µÆ³õÊ¼ĞÅÏ¢---Æğµ½ĞÄÌøµÄ×÷ÓÃ
+	 * @Description:ç”¨äºå®šæ—¶å¾—åˆ°æ¸©åº¦,æ¹¿åº¦,ç¯åˆå§‹ä¿¡æ¯---èµ·åˆ°å¿ƒè·³çš„ä½œç”¨
 	 **/
 	Runnable allInfoFlushRunnable = new Runnable() {
 
@@ -549,24 +419,23 @@ public class IHomeService extends Service{
 				{
 					break;
 				}
-				while(isAuthed == false)//µÈ´ıÖØĞÂÁ´½ÓºÍÉí·İÈÏÖ¤
+				while(isAuthed == false)//ç­‰å¾…é‡æ–°é“¾æ¥å’Œèº«ä»½è®¤è¯
 				{
 					try {
-						Thread.sleep(1000);//ÏÈĞİÃßÒ»ÃëµÈ´ıÁ´½Ó
+						Thread.sleep(1000);//å…ˆä¼‘çœ ä¸€ç§’ç­‰å¾…é“¾æ¥
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-
 				if(selectflag)
 				{
-					selectflag = !selectflag;//Ã¿´Î½»Ìæ¼ì²éÒ»´ÎÎÂ¶ÈºÍÊª¶È
-					/*ÇëÇóÎÂ¶È*/
+					selectflag = !selectflag;//æ¯æ¬¡äº¤æ›¿æ£€æŸ¥ä¸€æ¬¡æ¸©åº¦å’Œæ¹¿åº¦
+					/*è¯·æ±‚æ¸©åº¦*/
 					try {
-						/*ĞèÒª·¢ËÍµÄÖ¸Áî,byteÊı×é*/
+						/*éœ€è¦å‘é€çš„æŒ‡ä»¤,byteæ•°ç»„*/
 						byte typeBytes[] = {Instruction.COMMAND_CONTRL,Instruction.COMMAND_SEPERATOR};
-						byte accountBytes[] = account.getBytes("UTF-8");//µÃµ½±ê×¼µÄUTF-8±àÂë
+						byte accountBytes[] = account.getBytes("UTF-8");//å¾—åˆ°æ ‡å‡†çš„UTF-8ç¼–ç 
 						byte twoBytes[] = {Instruction.COMMAND_SEPERATOR,Instruction.CTL_GET,Instruction.COMMAND_SEPERATOR, 
 								Instruction.RES_TEMP, Instruction.COMMAND_SEPERATOR};
 						String IDString = new String("10000");
@@ -575,7 +444,7 @@ public class IHomeService extends Service{
 						byte threeBytes[] = {Instruction.COMMAND_SEPERATOR, Instruction.COMMAND_END};						
 						byte temp_buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
 						                       +TempIDBytes.length+threeBytes.length];
-						/*ºÏ²¢µ½Ò»¸öbyteÊı×éÖĞ*/
+						/*åˆå¹¶åˆ°ä¸€ä¸ªbyteæ•°ç»„ä¸­*/
 						int start = 0;
 						System.arraycopy(typeBytes    ,0,temp_buffer,start, typeBytes.length);
 						start+=typeBytes.length;
@@ -587,18 +456,18 @@ public class IHomeService extends Service{
 						start+=TempIDBytes.length;
 						System.arraycopy(threeBytes   ,0,temp_buffer,start, threeBytes.length);
 						
-						outputStream.write(temp_buffer, 0, temp_buffer.length);//·¢ËÍÖ¸Áî
+						outputStream.write(temp_buffer, 0, temp_buffer.length);//å‘é€æŒ‡ä»¤
 						outputStream.flush();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-						isConnected = false; //¶Ï¿ªÁ¬½Ó
-						isAuthed = false;    //ÈÏÖ¤Ê§Ğ§
+						isConnected = false; //æ–­å¼€è¿æ¥
+						isAuthed = false;    //è®¤è¯å¤±æ•ˆ
 					}
-					while(isAuthed == false)//µÈ´ıÖØĞÂÁ´½ÓºÍÉí·İÈÏÖ¤
+					while(isAuthed == false)//ç­‰å¾…é‡æ–°é“¾æ¥å’Œèº«ä»½è®¤è¯
 					{
 						try {
-							Thread.sleep(1000);//ÏÈĞİÃßÒ»ÃëµÈ´ıÁ´½Ó
+							Thread.sleep(1000);//å…ˆä¼‘çœ ä¸€ç§’ç­‰å¾…é“¾æ¥
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -606,12 +475,12 @@ public class IHomeService extends Service{
 					}
 				}
 				else {
-					selectflag = !selectflag;//Ã¿´Î½»Ìæ¼ì²éÒ»´ÎÎÂ¶ÈºÍÊª¶È
-					/*ÇëÇóÊª¶È*/
+					selectflag = !selectflag;//æ¯æ¬¡äº¤æ›¿æ£€æŸ¥ä¸€æ¬¡æ¸©åº¦å’Œæ¹¿åº¦
+					/*è¯·æ±‚æ¹¿åº¦*/
 					try {
-						/*ĞèÒª·¢ËÍµÄÖ¸Áî(»ñÈ¡Êª¶È),byteÊı×é*/
+						/*éœ€è¦å‘é€çš„æŒ‡ä»¤(è·å–æ¹¿åº¦),byteæ•°ç»„*/
 						byte typeBytes[] = {Instruction.COMMAND_CONTRL,Instruction.COMMAND_SEPERATOR};
-						byte accountBytes[] = account.getBytes("UTF-8");//µÃµ½±ê×¼µÄUTF-8±àÂë
+						byte accountBytes[] = account.getBytes("UTF-8");//å¾—åˆ°æ ‡å‡†çš„UTF-8ç¼–ç 
 						byte twoBytes[] = {Instruction.COMMAND_SEPERATOR,Instruction.CTL_GET, Instruction.COMMAND_SEPERATOR, 
 								Instruction.RES_HUMI, Instruction.COMMAND_SEPERATOR};
 						String IDString = new String("10000");
@@ -619,7 +488,7 @@ public class IHomeService extends Service{
 						byte threeBytes[] = {Instruction.COMMAND_SEPERATOR, Instruction.COMMAND_END};						
 						byte humi_buffer[] = new byte[typeBytes.length + accountBytes.length+twoBytes.length
 						                       +HumiIDBytes.length+threeBytes.length];
-						/*ºÏ²¢µ½Ò»¸öbyteÊı×éÖĞ*/
+						/*åˆå¹¶åˆ°ä¸€ä¸ªbyteæ•°ç»„ä¸­*/
 						int start = 0;
 						System.arraycopy(typeBytes    ,0,humi_buffer,start, typeBytes.length);
 						start+=typeBytes.length;
@@ -631,18 +500,18 @@ public class IHomeService extends Service{
 						start+=HumiIDBytes.length;
 						System.arraycopy(threeBytes   ,0,humi_buffer,start, threeBytes.length);
 						
-						outputStream.write(humi_buffer, 0, humi_buffer.length);//·¢ËÍÖ¸Áî
+						outputStream.write(humi_buffer, 0, humi_buffer.length);//å‘é€æŒ‡ä»¤
 						outputStream.flush();
 					} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-							isConnected = false; //¶Ï¿ªÁ¬½Ó
-							isAuthed = false;    //ÈÏÖ¤Ê§Ğ§
+							isConnected = false; //æ–­å¼€è¿æ¥
+							isAuthed = false;    //è®¤è¯å¤±æ•ˆ
 					}
 					
 				}
 				try {
-					Thread.sleep(10000);      //10s»ñµÃÒ»´Î
+					Thread.sleep(10000);      //10sè·å¾—ä¸€æ¬¡
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -657,20 +526,25 @@ public class IHomeService extends Service{
 	/**
 	* @Function: revMsgRunnable;
 	* @Description:
-	*      ÓÃÓÚ½ÓÊÜ²¢ÇÒ´¦Àí·şÎñÆ÷·¢ËÍÀ´µÄĞÅÏ¢
+	*      ç”¨äºæ¥å—å¹¶ä¸”å¤„ç†æœåŠ¡å™¨å‘é€æ¥çš„ä¿¡æ¯
 	**/
 	Runnable revMsgRunnable = new Runnable() {
 
+		private byte handleBuffer[] = new byte[4096];
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
 			int i;
 			int start;
 			int end;
+			int msgStart = 0;
+			int bufferEnd = 0;
 			int type;
-			String accountString;
 			int subtype = 0;
 			int res;
+			String accountString;
+			String dataLengthString;
+			int dataLength;
 			
 			while(true)
 			{
@@ -678,20 +552,20 @@ public class IHomeService extends Service{
 				{
 					break;
 				}
-				if(isTestWifi == true)//ÕıÔÚ²âÊÔwifiÄÜ·ñÁ¬½Óµ½stm32
+				if(isTestWifi == true)//æ­£åœ¨æµ‹è¯•wifièƒ½å¦è¿æ¥åˆ°stm32
 				{
 					try {
-						Thread.sleep(1000);//ÏÈĞİÃßÒ»Ãë
+						Thread.sleep(1000);//å…ˆä¼‘çœ ä¸€ç§’
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					continue;
 				}
-				while(isConnected == false)//¶Ï¿ªÁ¬½Ó£¬ÏÈµÈ´ıÖØĞÂÁ´½Ó
+				while(isConnected == false)//æ–­å¼€è¿æ¥ï¼Œå…ˆç­‰å¾…é‡æ–°é“¾æ¥
 				{
 					try {
-						Thread.sleep(1000);//ÏÈĞİÃßÒ»ÃëµÈ´ıÁ´½Ó
+						Thread.sleep(1000);//å…ˆä¼‘çœ ä¸€ç§’ç­‰å¾…é“¾æ¥
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -699,106 +573,259 @@ public class IHomeService extends Service{
 				}
 				try {
 
-					/*µÃµ½·şÎñÆ÷·µ»ØĞÅÏ¢*/
+					/*å¾—åˆ°æœåŠ¡å™¨è¿”å›ä¿¡æ¯*/
 					int temp = inputStream.read(buffer);
 					if(temp < 0)
 					{
-						throw new Exception("¶Ï¿ªÁ¬½Ó");
+						throw new Exception("æ–­å¼€è¿æ¥");
 					}
 //					Intent tempintent = new Intent();
 //					tempintent.setAction(tempintent.ACTION_EDIT);
-//					/*·µ»ØihomeÄ£Ê½¿ªÆôÇé¿ö*/
+//					/*è¿”å›ihomeæ¨¡å¼å¼€å¯æƒ…å†µ*/
 //					tempintent.putExtra("type", "video");
 //					tempintent.putExtra("video", "read:"+temp);
 //					sendBroadcast(tempintent);
-					String revString = new String(buffer, 0, temp);	
+					//å…ˆå¤åˆ¶åˆ°å¤„ç†çš„ç¼“å†²åŒºä¸­
+					System.arraycopy(buffer    ,0, handleBuffer, bufferEnd, temp);
+					bufferEnd += temp;
+					System.out.println("rev msg's length: " + temp);
 					i = 0;
-					System.out.println("get msg from server read:"+temp+" string:"+revString.length());
-					while(i<revString.length())//¿ÉÄÜÓĞ¶à×éĞÅÏ¢
+					while(true)//å¯èƒ½æœ‰å¤šç»„ä¿¡æ¯
 					{
-						/*»ñµÃÖ¸ÁîÖ÷type*/
-						if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
+						if(i == bufferEnd)
 						{
-							type = revString.charAt(i);
+							if(handleBuffer[i-1] != Instruction.COMMAND_END) //æ²¡æœ‰æ­£å¸¸ç»“å°¾
+							{
+								if(bufferEnd > msgStart)
+								{
+									System.out.println("fetch up handleBuffer's end, msgStart:" + msgStart + " bufferEnd:" + bufferEnd);
+									System.arraycopy(handleBuffer    , msgStart ,handleBuffer, 0, bufferEnd - msgStart);
+									bufferEnd = bufferEnd - msgStart;
+								}
+								System.out.println("fetch up handleBuffer's end, noting");
+								break; //å¤„ç†å®ŒhandleBufferä¸­æ‰€æœ‰å®Œæ•´çš„ä¿¡æ¯ï¼Œåªå‰©ä¸‹ä¸å®Œæ•´çš„æŒ‡ä»¤ã€‚
+							}
+							else //æ­£å¸¸ç»“æŸ
+							{
+								System.out.println("normal end msg");
+								bufferEnd = 0; //æ¸…ç©ºç¼“å†²åŒº
+								break;
+							}
+						}
+						msgStart = i; //è®°å½•æœ¬æ¬¡å¤„ç†çš„ä¿¡æ¯å¤´
+						/*è·å¾—æŒ‡ä»¤ä¸»type*/
+						if((i + 1 < bufferEnd )&&(handleBuffer[i+1] ==Instruction.COMMAND_SEPERATOR))
+						{
+							type = handleBuffer[i];
 							i+=2;
+							if(type == Instruction.COMMAND_PULSE)
+							{
+								i++;
+								System.out.println("pulse");
+								continue;
+							}
+							else if(type == Instruction.COMMAND_VIDEO)
+							{
+								System.out.println("===========================================COMMAND_VIDEO=======================================");
+							}
 						}
 						else {
-							/*µ±Ç°Ö¸Áî´íÎóÔòÌø×ªµ½ÏÂÒ»¸öÖ¸Áî*/
-							while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
+							/*å½“å‰æŒ‡ä»¤é”™è¯¯åˆ™è·³è½¬åˆ°ä¸‹ä¸€ä¸ªæŒ‡ä»¤*/
+							while( (i+1<bufferEnd) && ((handleBuffer[i+1])!=Instruction.COMMAND_END) && ((handleBuffer[i+1])!=Instruction.COMMAND_SEPERATOR) )
 							{
 								i++;
 							}
-							i++;
+							if(i+1 == bufferEnd)
+							{
+								i += 1;
+							}
+							else if((handleBuffer[i+1]) == Instruction.COMMAND_END)
+							{
+								i += 2;
+								msgStart = i;
+							}
+							else if(handleBuffer[i+1] == Instruction.COMMAND_SEPERATOR)
+							{
+								;
+							}
 							continue;
 						}
-						/*»ñµÃÕË»§*/
-						for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+							/*è·å¾—è´¦æˆ·*/
+						for(start = i, end = start; (end<bufferEnd)&&((handleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 						{
 							;
 						}
 						i++;
-						accountString = new String(revString.substring(start, end));
-						/*È·¶¨À´×ÔÓÚ×Ô¼ºµÄ¿ØÖÆÖĞĞÄ»òÕßSERVER*/
+						accountString = new String(handleBuffer, start, end - start); //å­—ç¬¦ä¸²é•¿åº¦end - start
+						System.out.println("account:"+accountString);
+							/*ç¡®å®šæ¥è‡ªäºè‡ªå·±çš„æ§åˆ¶ä¸­å¿ƒæˆ–è€…SERVER*/
 						if(!accountString.equals(account+'h')&&!accountString.equals("SERVER"))
 						{
-							while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
+							System.out.println("account check failed account:" + accountString.length());
+							/*å½“å‰æŒ‡ä»¤é”™è¯¯åˆ™è·³è½¬åˆ°ä¸‹ä¸€ä¸ªæŒ‡ä»¤*/
+							while((i<bufferEnd)&&(handleBuffer[i])!=Instruction.COMMAND_END)
 							{
 								i++;
 							}
 							i++;
 							continue;
 						}
-						/*»ñµÃÖ¸Áîsubtype*/
-						if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
+						System.out.println("account check success");
+					   /*-------------------å…ˆå¤„ç†è§†é¢‘æŒ‡ä»¤------------------------*/
+						if(type == Instruction.COMMAND_VIDEO)
 						{
-							subtype = revString.charAt(i);
-							i+=2;
-						}
-						else {
-							while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
+							System.out.println("video COMMAND_VIDEO");
+							/*è·å¾—æ‘„åƒå¤´ID*/
+							for(start = i, end = start; (end<handleBuffer.length)&&((handleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 							{
-								i++;
+								;
 							}
 							i++;
-							continue;
-						}
-						System.out.println("type:"+type + "sub:"+subtype);
-						/*Ô¤´¦Àíºó´¦ÀíÖ¸Áî*/
+							cameraIDString = new String(handleBuffer, start, end - start);
+							if(cameraIDString.equals(cameraIDString))//ç¡®å®šä¸ºéœ€è¦çš„è§†é¢‘IDï¼š20000
+							{
+								subtype = handleBuffer[i];
+								if(subtype == Instruction.VIDEO_START)//è§†é¢‘æµå¼€å§‹
+								{
+									System.out.println("video start");
+									i += 2;
+									try {
+										jpegOutputStream = new FileOutputStream("mnt/sdcard/camera.jpg");
+									} catch (Exception e) {
+										// TODO: handle exception
+										e.printStackTrace();
+									}
+									Intent intent = new Intent();
+									intent.setAction(intent.ACTION_EDIT);
+									/*è¿”å›ihomeæ¨¡å¼å¼€å¯æƒ…å†µ*/
+									intent.putExtra("type", "video");
+									intent.putExtra("video", "video start");
+									sendBroadcast(intent);
+									msgStart = i;
+
+								}//end of video_start
+								else if(subtype == Instruction.VIDEO_STOP)//æ•°æ®æµç»“æŸ
+								{
+									System.out.println("video stop");
+									i += 2;
+
+									Intent intent = new Intent();
+									intent.setAction(intent.ACTION_EDIT);
+									/*è¿”å›ihomeæ¨¡å¼å¼€å¯æƒ…å†µ*/
+									intent.putExtra("type", "video");
+									intent.putExtra("video", "video stop");
+									sendBroadcast(intent);
+
+									if(jpegOutputStream != null)
+									{
+										try {
+											jpegOutputStream.close();//å…³é—­è¾“å‡ºæµ
+										} catch (Exception e) {
+											// TODO: handle exception
+											e.printStackTrace();
+										}
+									}
+									msgStart = i;
+								}//end of video stop
+								else {
+									System.out.println("video data====================================");
+									/*è·å¾—æ•°æ®é•¿åº¦*/
+									for(start = i, end = start; (end<handleBuffer.length)&&((handleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+									{
+										;
+									}
+									i++;
+									dataLengthString = new String(handleBuffer, start, end - start);
+									/*æ•°æ®é•¿åº¦*/
+									dataLength = Integer.valueOf(dataLengthString);
+									//è¯´æ˜ä¸ºæ•°æ®
+
+									if(i + dataLength <= handleBuffer.length)//æ”¶åˆ°æ‰€æœ‰çš„æ•°æ®
+									{
+										try {
+											jpegOutputStream.write(handleBuffer, i, i + dataLength);
+											Intent intent = new Intent();
+											intent.setAction(intent.ACTION_EDIT);
+											/*è¿”å›ihomeæ¨¡å¼å¼€å¯æƒ…å†µ*/
+											intent.putExtra("type", "video");
+											intent.putExtra("video", dataLength+" ");
+											sendBroadcast(intent);
+										} catch (Exception e) {
+											// TODO: handle exception
+											e.printStackTrace();
+										}
+									}
+									else {//æ²¡æœ‰å—åˆ°æ‰€æœ‰æ•°æ®
+										continue; //ç­‰å¾…æ¥æ”¶å¥½ä¸‹ä¸€ä¸ªæŒ‡ä»¤å†ä½œæ‰“ç®—
+									}
+									i += dataLength;
+									msgStart = i; //æ­£å¸¸å®Œæˆå¤„ç†
+								}//end of æ˜¯æ•°æ®
+								continue;
+
+							}//end of camera id
+
+						}//end of è§†é¢‘æŒ‡ä»¤
 						if(type == Instruction.COMMAND_RESULT)
 						{
-							System.out.println("COMMAND_RESULT");
-							/*---------------rev res_ihome----------*/
+							type = 0; //æ¸…ç©ºtype
+							/*è·å¾—æŒ‡ä»¤subtype*/
+							if((i + 1 < bufferEnd )&&(handleBuffer[i+1]==Instruction.COMMAND_SEPERATOR))
+							{
+								subtype = handleBuffer[i];
+								i+=2;
+							}
+							else {
+								while((i < bufferEnd)&&(handleBuffer[i])!=Instruction.COMMAND_END)
+								{
+									i++;
+								}
+								i++;
+								continue;
+							}
+								/*---------------rev res_ihome----------*/
 							if(subtype == Instruction.RES_IHome)
 							{
-								if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
+								if((i + 1 < bufferEnd )&&(handleBuffer[i+1] == Instruction.COMMAND_SEPERATOR))
 								{
-									subtype = revString.charAt(i);
+									subtype = handleBuffer[i];
 									i+=2;
 								}
+								else {
+									while((i < bufferEnd)&&(handleBuffer[i])!=Instruction.COMMAND_END)
+									{
+										i++;
+									}
+									i++;
+									continue;
+								}
+
 								Intent intent = new Intent();
 								intent.setAction(intent.ACTION_EDIT);
 								if(subtype == Instruction.IHome_START)
 								{
-									/*·µ»ØihomeÄ£Ê½¿ªÆôÇé¿ö*/
+										/*è¿”å›ihomeæ¨¡å¼å¼€å¯æƒ…å†µ*/
 									intent.putExtra("type", "ihome");
 									intent.putExtra("ihome", "start");
 									sendBroadcast(intent);
+									msgStart = i;
 								}
 								else if(subtype == Instruction.IHome_STOP){
-									/*·µ»ØihomeÄ£Ê½¿ªÆôÇé¿ö*/
+										/*è¿”å›ihomeæ¨¡å¼å¼€å¯æƒ…å†µ*/
 									intent.putExtra("type", "ihome");
 									intent.putExtra("ihome", "stop");
 									sendBroadcast(intent);
+									msgStart = i;
 								}
 							}//end of res_ihome
 							else if(subtype == Instruction.RES_LOGIN)
 							{
 								System.out.println("MAN_LOGIN");
-								if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
+								if((i + 1 < bufferEnd)&&(handleBuffer[i+1]==Instruction.COMMAND_SEPERATOR))
 								{
-									subtype = revString.charAt(i);
+									subtype = handleBuffer[i];
 									i+=2;
-									if(subtype == Instruction.LOGIN_SUCCESS)//µÇÂ½³É¹¦
+									if(subtype == Instruction.LOGIN_SUCCESS)//ç™»é™†æˆåŠŸ
 									{
 										Intent intent = new Intent();
 										intent.setAction(intent.ACTION_ANSWER);
@@ -811,16 +838,19 @@ public class IHomeService extends Service{
 											intent.putExtra("result", "center");
 											intent.putExtra("center", "success");
 										}
-							            sendBroadcast(intent);
-							            isAuthed = true; //Éí·İÈÏÕæ³É¹¦
-							            
-							            /*Éí·İÈÏÖ¤³É¹¦*/
+										sendBroadcast(intent);
+										isAuthed = true; //èº«ä»½è®¤çœŸæˆåŠŸ
+
+										System.out.println("èº«ä»½è®¤è¯æˆåŠŸ");
+
+							            /*èº«ä»½è®¤è¯æˆåŠŸ*/
 										intent.setAction(intent.ACTION_EDIT);
 										intent.putExtra("type", "disconnect");
 										intent.putExtra("disconnect", "authed");
 										sendBroadcast(intent);
+										msgStart = i;
 									}
-									else 
+									else
 									{
 										Intent intent = new Intent();
 										intent.setAction(intent.ACTION_ANSWER);
@@ -833,14 +863,16 @@ public class IHomeService extends Service{
 											intent.putExtra("result", "center");
 											intent.putExtra("center", "failed");
 										}
-							            sendBroadcast(intent);
-										isAuthed = false;    //ÈÏÖ¤Ê§°Ü
-										accountReady = false;  //ĞÅÏ¢´íÎó
+										sendBroadcast(intent);
+										isAuthed = false;    //è®¤è¯å¤±è´¥
+										accountReady = false;  //ä¿¡æ¯é”™è¯¯
+										System.out.println("èº«ä»½è®¤è¯å¤±è´¥");
+										msgStart = i;
 									}//end of login state
 								}
-								else 
+								else
 								{
-									while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
+									while((i< bufferEnd)&&( handleBuffer[i])!=Instruction.COMMAND_END)
 									{
 										i++;
 									}
@@ -848,21 +880,21 @@ public class IHomeService extends Service{
 									continue;
 								}
 							}//end of man_login
-							/*µÆµÄ×´Ì¬*/
+								/*ç¯çš„çŠ¶æ€*/
 							else if(subtype == Instruction.RES_LAMP)
 							{
 								System.out.println("res_lamp");
 								Intent intent = new Intent();
 								intent.setAction(intent.ACTION_EDIT);
-								/*»ñµÃµÆµÄ×´Ì¬*/
-								if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
+									/*è·å¾—ç¯çš„çŠ¶æ€*/
+								if((i + 1 < bufferEnd )&&( handleBuffer[i+1] ==Instruction.COMMAND_SEPERATOR))
 								{
-									res = revString.charAt(i);
+									res = handleBuffer[i];
 									i+=2;
 								}
 								else {
-									/*²»·ûºÏÖ¸Áî¸ñÊ½*/
-									while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
+									/*ä¸ç¬¦åˆæŒ‡ä»¤æ ¼å¼*/
+									while((i< bufferEnd)&&( handleBuffer[i])!=Instruction.COMMAND_END)
 									{
 										i++;
 									}
@@ -871,49 +903,51 @@ public class IHomeService extends Service{
 								}
 								if(res == Instruction.LAMP_ON)
 								{
-									/*»ñµÃµÆID*/
-									for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+										/*è·å¾—ç¯ID*/
+									for(start = i, end = start; (end< bufferEnd)&&(( handleBuffer[end]!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 									{
 										;
 									}
 									i++;
-									String IDString = new String(revString.substring(start, end));
+									String IDString = new String(handleBuffer, start, end - start);
 									intent.putExtra("type", "ledon");
 									intent.putExtra("ledon", IDString);
+									msgStart = i;
 								}
 								else if(res == Instruction.LAMP_OFF)
 								{
-									/*»ñµÃµÆID*/
-									for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+										/*è·å¾—ç¯ID*/
+									for(start = i, end = start; (end< bufferEnd)&&(( handleBuffer[end]!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 									{
 										;
 									}
 									i++;
-									String IDString = new String(revString.substring(start, end));
+									String IDString = new String(handleBuffer, start, end - start);
 									intent.putExtra("type", "ledoff");
 									intent.putExtra("ledoff", IDString);
+									msgStart = i;
 								}
 								sendBroadcast(intent);
 							}
-							else if(subtype == Instruction.RES_TEMP)/*»ñÈ¡ÎÂ¶È*/
+							else if(subtype == Instruction.RES_TEMP)/*è·å–æ¸©åº¦*/
 							{
 								Intent intent = new Intent();
 								intent.setAction(intent.ACTION_EDIT);
-								/*»ñµÃÉè±¸ID*/
-								for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+								/*è·å¾—è®¾å¤‡ID*/
+								for(start = i, end = start; (end< bufferEnd)&&(( handleBuffer[end]!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 								{
 									;
 								}
 								i++;
-								String IDString = new String(revString.substring(start, end));
-								/*»ñµÃvalue*/
-								if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
+								String IDString = new String(handleBuffer, start, end - start);
+								/*è·å¾—value*/
+								if((i + 1 < bufferEnd)&&( handleBuffer[i+1]==Instruction.COMMAND_SEPERATOR))
 								{
-									res = revString.charAt(i);
+									res = handleBuffer[i];
 									i+=2;
 								}
 								else {
-									while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
+									while((i< bufferEnd)&&( handleBuffer[i])!=Instruction.COMMAND_END)
 									{
 										i++;
 									}
@@ -921,30 +955,31 @@ public class IHomeService extends Service{
 									continue;
 								}
 								intent.putExtra("type", "temp");
-								intent.putExtra("temp", IDString);//·¢ËÍÉè±¸ID
-								intent.putExtra(IDString, res+"");
+								intent.putExtra("temp", IDString);//å‘é€è®¾å¤‡ID
+								intent.putExtra(IDString, res + "");
 								sendBroadcast(intent);
+								msgStart = i;
 							}
-							/*Êª¶È*/
+							/*æ¹¿åº¦*/
 							else if(subtype == Instruction.RES_HUMI)
 							{
 								Intent intent = new Intent();
 								intent.setAction(intent.ACTION_EDIT);
-								/*»ñµÃÉè±¸ID*/
-								for(start = i, end = start; (end<revString.length())&&((revString.charAt(end)!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+								/*è·å¾—è®¾å¤‡ID*/
+								for(start = i, end = start; (end< bufferEnd)&&(( handleBuffer[end]!=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 								{
 									;
 								}
 								i++;
-								String IDString = new String(revString.substring(start, end));
-								/*»ñµÃvalue*/
-								if((i + 1 <revString.length())&&(revString.charAt(i+1)==Instruction.COMMAND_SEPERATOR))
+								String IDString = new String(handleBuffer, start, end - start);
+								/*è·å¾—value*/
+								if((i + 1 < bufferEnd)&&( handleBuffer[i+1]==Instruction.COMMAND_SEPERATOR))
 								{
-									res = revString.charAt(i);
+									res = handleBuffer[i];
 									i+=2;
 								}
 								else {
-									while((i<revString.length())&&(revString.charAt(i))!=Instruction.COMMAND_END)
+									while((i< bufferEnd)&&( handleBuffer[i])!=Instruction.COMMAND_END)
 									{
 										i++;
 									}
@@ -952,250 +987,65 @@ public class IHomeService extends Service{
 									continue;
 								}
 								intent.putExtra("type", "humi");
-								intent.putExtra("humi", IDString);//·¢ËÍÉè±¸ID
-								intent.putExtra(IDString, res+"");
+								intent.putExtra("humi", IDString);//å‘é€è®¾å¤‡ID
+								intent.putExtra(IDString, res + "");
 								sendBroadcast(intent);
-								
+								msgStart = i;
 							}
 						}
-					
-					}
-						
-					
-				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					
-					isConnected = false; //¶Ï¿ªÁ¬½Ó
-					isAuthed = false;    //ÈÏÖ¤Ê§Ğ§
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					
-					isConnected = false; //¶Ï¿ªÁ¬½Ó
-					isAuthed = false;    //ÈÏÖ¤Ê§Ğ§
-				} catch (Exception e) {
-					// TODO: handle exception
-					e.printStackTrace();			
-					isConnected = false; //¶Ï¿ªÁ¬½Ó
-					isAuthed = false;    //ÈÏÖ¤Ê§Ğ§
-				}
-			}
-			
-		}
-		
-	};
-	
-	/**
-	* @Function: revVideoRunnable;
-	* @Description:
-	*      ÓÃÓÚ½ÓÊÜÊÓÆµÎÄ¼ş²¢ÇÒ±£´æµ½ÊÖ»úÖĞ
-	**/
-	Runnable revVideoRunnable = new Runnable() {
-
-		private byte[] videoHandleBuffer = new byte[4096];
-		private int videoEnd = 0;
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			int i;
-			int start;
-			int end;
-			int type;
-			String accountString;
-			String cameraIDString;
-			String dataLengthString;
-			int dataLength;
-			int subtype = 0;
-			int res;
-			int msgStart;
-			
-			while(true)
-			{
-				if(stopallthread)
-				{
-					break;
-				}
-				while(videoIsConnected == false)//Á¬½ÓÒÑ¾­¶Ï¿ª£¬ÏÈµÈ´ıÖØĞÂÁ´½Ó
-				{
-					try {
-						Thread.sleep(1000);//ÏÈĞİÃßÒ»ÃëµÈ´ıÁ´½Ó
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				try {
-
-					/*µÃµ½·şÎñÆ÷·µ»ØĞÅÏ¢*/
-					int temp = videoInputStream.read(videoBuffer);
-					if(temp < 0)
-					{
-						throw new Exception("¶Ï¿ªÁ¬½Ó");
-					}
-//					Intent tempintent = new Intent();
-//					tempintent.setAction(tempintent.ACTION_EDIT);
-//					/*·µ»ØihomeÄ£Ê½¿ªÆôÇé¿ö*/
-//					tempintent.putExtra("type", "video");
-//					tempintent.putExtra("video", "read:"+temp);
-//					sendBroadcast(tempintent);
-					//ÏÈ¸´ÖÆµ½´¦ÀíµÄ»º³åÇøÖĞ
-					System.arraycopy(videoBuffer    ,0,videoHandleBuffer, videoEnd, temp);
-					videoEnd += temp;
-					i = 0;
-					System.out.println("get msg from server read:"+temp);
-					while(i < videoHandleBuffer.length)//¿ÉÄÜÓĞ¶à×éĞÅÏ¢
-					{
-						msgStart = i; //¼ÇÂ¼±¾´Î´¦ÀíµÄĞÅÏ¢Í·
-						/*»ñµÃÖ¸ÁîÖ÷type*/
-						if((i + 1 <videoHandleBuffer.length)&&(videoHandleBuffer[i+1] ==Instruction.COMMAND_SEPERATOR))
+						else //ä¸åœ¨è§„å®šæŒ‡ä»¤å†…ï¼Œæ‰€ä»¥æ˜¯æ— æ•ˆæŒ‡ä»¤ï¼Œæ»¤å»
 						{
-							type = videoHandleBuffer[i];
-							i+=2;
-						}
-						else {
-							/*µ±Ç°Ö¸Áî´íÎóÔòÌø×ªµ½ÏÂÒ»¸öÖ¸Áî*/
-							while((i<videoHandleBuffer.length)&&(videoHandleBuffer[i])!=Instruction.COMMAND_END)
+							while((i < bufferEnd)&&(handleBuffer[i])!=Instruction.COMMAND_END)
 							{
 								i++;
 							}
 							i++;
-							continue;
-						}
-						/*»ñµÃÕË»§*/
-						for(start = i, end = start; (end<videoHandleBuffer.length)&&((videoHandleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
-						{
-							;
-						}
-						i++;
-						accountString = new String(videoHandleBuffer, start, end);
-						/*È·¶¨À´×ÔÓÚ×Ô¼ºµÄ¿ØÖÆÖĞĞÄ»òÕßSERVER*/
-						if(!accountString.equals(account+'h')&&!accountString.equals("SERVER"))
-						{
-							/*µ±Ç°Ö¸Áî´íÎóÔòÌø×ªµ½ÏÂÒ»¸öÖ¸Áî*/
-							while((i<videoHandleBuffer.length)&&(videoHandleBuffer[i])!=Instruction.COMMAND_END)
-							{
-								i++;
-							}
-							i++;
-							continue;
-						}
-					   /*-------------------ÏÈ´¦ÀíÊÓÆµÖ¸Áî------------------------*/
-						if(type == Instruction.COMMAND_VIDEO)
-						{	
-							/*»ñµÃÉãÏñÍ·ID*/
-							for(start = i, end = start; (end<videoHandleBuffer.length)&&((videoHandleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+							if((i - 1) == bufferEnd)
 							{
 								;
 							}
-							i++;
-							cameraIDString = new String(videoHandleBuffer, start, end);
-							if(cameraIDString.equals(cameraIDString))//È·¶¨ÎªĞèÒªµÄÊÓÆµID£º20000
+							else
 							{
-								subtype = videoHandleBuffer[i];
-								if(subtype == Instruction.VIDEO_START)//ÊÓÆµÁ÷¿ªÊ¼
-								{
-									i += 2;
-									try {
-										jpegOutputStream = new FileOutputStream("mnt/sdcard/camera.jpg");
-									} catch (Exception e) {
-										// TODO: handle exception
-										e.printStackTrace();
-									}
-									Intent intent = new Intent();
-									intent.setAction(intent.ACTION_EDIT);
-									/*·µ»ØihomeÄ£Ê½¿ªÆôÇé¿ö*/
-									intent.putExtra("type", "video");
-									intent.putExtra("video", "video start");
-									sendBroadcast(intent);
-									
-								}//end of video_start
-								else if(subtype == Instruction.VIDEO_STOP)//Êı¾İÁ÷½áÊø
-								{
-									i += 2;
-									
-									Intent intent = new Intent();
-									intent.setAction(intent.ACTION_EDIT);
-									/*·µ»ØihomeÄ£Ê½¿ªÆôÇé¿ö*/
-									intent.putExtra("type", "video");
-									intent.putExtra("video", "video stop");
-									sendBroadcast(intent);
-									
-									if(jpegOutputStream != null)
-									{
-										try {
-											jpegOutputStream.close();//¹Ø±ÕÊä³öÁ÷
-										} catch (Exception e) {
-											// TODO: handle exception
-											e.printStackTrace();
-										}
-									}
-								}//end of video stop
-								else {
-									/*»ñµÃÊı¾İ³¤¶È*/
-									for(start = i, end = start; (end<videoHandleBuffer.length)&&((videoHandleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
-									{
-										;
-									}
-									i++;
-									dataLengthString = new String(videoHandleBuffer, start, end);
-									/*Êı¾İ³¤¶È*/
-									dataLength = Integer.valueOf(dataLengthString);
-									//ËµÃ÷ÎªÊı¾İ
-									
-									if(i + dataLength <= videoHandleBuffer.length)//ÊÕµ½ËùÓĞµÄÊı¾İ
-									{
-										try {
-											jpegOutputStream.write(videoHandleBuffer, i, i + dataLength);
-											Intent intent = new Intent();
-											intent.setAction(intent.ACTION_EDIT);
-											/*·µ»ØihomeÄ£Ê½¿ªÆôÇé¿ö*/
-											intent.putExtra("type", "video");
-											intent.putExtra("video", dataLength+" ");
-											sendBroadcast(intent);
-										} catch (Exception e) {
-											// TODO: handle exception
-											e.printStackTrace();
-										}
-									}
-									else {//Ã»ÓĞÊÜµ½ËùÓĞÊı¾İ
-										System.arraycopy(videoHandleBuffer    , msgStart ,videoHandleBuffer, 0, videoHandleBuffer.length - msgStart);
-										videoEnd = 10;
-									}
-									i += dataLength;
-								}//end of ÊÇÊı¾İ
-								continue;
+								msgStart = i;
+							}
+							continue;
+						}
 
-							}//end of camera id
-							
-						}//end of ÊÓÆµÖ¸Áî
-					
-					}//end of while(i < videoHandleBuffer.length) ´¦Àí¶à×éĞÅÏ¢
+					}//end of while(i < bufferEnd) å¤„ç†å¤šç»„ä¿¡æ¯
 						
 					
 				} catch (UnknownHostException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					videoIsConnected = false; //¶Ï¿ªÁ¬½Ó
+					
+					isConnected = false; //æ–­å¼€è¿æ¥
+					isAuthed = false;    //è®¤è¯å¤±æ•ˆ
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					videoIsConnected = false; //¶Ï¿ªÁ¬½Ó
+					
+					isConnected = false; //æ–­å¼€è¿æ¥
+					isAuthed = false;    //è®¤è¯å¤±æ•ˆ
 				} catch (Exception e) {
 					// TODO: handle exception
 					e.printStackTrace();			
-					videoIsConnected = false; //¶Ï¿ªÁ¬½Ó
+					isConnected = false; //æ–­å¼€è¿æ¥
+					isAuthed = false;    //è®¤è¯å¤±æ•ˆ
 				}
 			}
 			
 		}
 		
 	};
+
+
+	
+
 	
 	/** 
 	 * @Description:
-	 * 	 ¼àÌı·¢ËÍ¸øServiceµÄ¹ã²¥ 
-	 *  ÓÃÓÚ×ª·¢ĞÅÏ¢¸ø·şÎñÆ÷
+	 * 	 ç›‘å¬å‘é€ç»™Serviceçš„å¹¿æ’­ 
+	 *  ç”¨äºè½¬å‘ä¿¡æ¯ç»™æœåŠ¡å™¨
 	 **/
 	private class ServiceReceiver extends BroadcastReceiver{
 
@@ -1206,12 +1056,12 @@ public class IHomeService extends Service{
 			if(typeString.equals("send"))
 			{
 				try {
-					/*½ÓÊÕFragment´«µİÀ´µÄ²¿·ÖÖ¸Áî,²¢Ìí¼Óaccount*/
+					/*æ¥æ”¶Fragmentä¼ é€’æ¥çš„éƒ¨åˆ†æŒ‡ä»¤,å¹¶æ·»åŠ account*/
 					byte onefield[] = intent.getByteArrayExtra("onefield");
 					byte accountfield[] = account.getBytes("UTF-8");
 					byte twofield[] = intent.getByteArrayExtra("twofield");
 					byte buffer[] = new byte[onefield.length + accountfield.length+twofield.length];
-					/*ºÏ²¢µ½Ò»¸öbyteÊı×éÖĞ*/
+					/*åˆå¹¶åˆ°ä¸€ä¸ªbyteæ•°ç»„ä¸­*/
 					int start = 0;
 					System.arraycopy(onefield    ,0,buffer,start, onefield.length);
 					start+=onefield.length;
@@ -1227,17 +1077,17 @@ public class IHomeService extends Service{
 				}catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					isConnected = false; //¶Ï¿ªÁ¬½Ó
-					isAuthed = false;    //ÈÏÖ¤Ê§Ğ§
-				}//·¢ËÍÖ¸Áî
+					isConnected = false; //æ–­å¼€è¿æ¥
+					isAuthed = false;    //è®¤è¯å¤±æ•ˆ
+				}//å‘é€æŒ‡ä»¤
 			}
 			else if(typeString.equals("ClientMainBack"))
 			{
-				/*Ö÷¿Ø½çÃæ°´ÏÂÁË·µ»Ø¼ü£¬ĞèÒªÖØĞÂµÇÂ¼*/
+				/*ä¸»æ§ç•Œé¢æŒ‰ä¸‹äº†è¿”å›é”®ï¼Œéœ€è¦é‡æ–°ç™»å½•*/
 				isConnected = false;
 				isAuthed = false;
 				accountReady = false;
-				if(serverSocket != null)//Èç¹ûÓĞsocketÁ¬½ÓÔò½â³ıÁ¬½Ó
+				if(serverSocket != null)//å¦‚æœæœ‰socketè¿æ¥åˆ™è§£é™¤è¿æ¥
 				{
 					try {
 						serverSocket.close();
@@ -1247,7 +1097,7 @@ public class IHomeService extends Service{
 					}
 				}
 				
-				/*Í¨ÖªµÇÂ¼activityÒª½øĞĞÖØĞÂµÇÂ¼*/
+				/*é€šçŸ¥ç™»å½•activityè¦è¿›è¡Œé‡æ–°ç™»å½•*/
 				Intent intent1 = new Intent();
 				intent1.setAction(intent1.ACTION_ANSWER);
 	    		intent1.putExtra("result", "relogin");

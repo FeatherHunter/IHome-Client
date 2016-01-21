@@ -26,24 +26,24 @@ import com.feather.bottombar.BottomBarPanel;
 import com.feather.service.IHomeService;
 
 /** 
- * @CopyRight: Íõ³½ºÆ 2015~2025
- * @Author Feather Hunter(ÁÔÓğ)
- * @qq:975559549
+ * @CopyRight: ç‹è¾°æµ© 2015~2025
+ * @Author Feather Hunter(çŒç¾½)
+ * @qq: 975559549
  * @Version: 1.0 
- * @Date:2015/12/25
- * @Description: µÇÂ½½çÃæ,ÓÃÓÚÊäÈëÕËºÅÃÜÂëºóÆô¶¯ºóÌ¨Service½øĞĞÉí·İÈÏÖ¤µÇÂ¼¡£
- *        ÏêÏ¸ÏîÄ¿½éÉÜ£º
- *        1.onCreateÉèÖÃºÃ¸÷¸ö×é¼ş
- *        2.¼àÌıµ½µÇÂ½°´¼üºó£¬Æô¶¯ºóÌ¨ServiceºÍReceiver£¬ÔÚµÇÂ½³É¹¦ºóÌø×ªµ½ClientMainActivityµÄÖ÷¿Ø½çÃæ
+ * @Date: 2015/12/25
+ * @Description: ç™»é™†ç•Œé¢,ç”¨äºè¾“å…¥è´¦å·å¯†ç åå¯åŠ¨åå°Serviceè¿›è¡Œèº«ä»½è®¤è¯ç™»å½•ã€‚
+ *        è¯¦ç»†é¡¹ç›®ä»‹ç»ï¼š
+ *        1.onCreateè®¾ç½®å¥½å„ä¸ªç»„ä»¶
+ *        2.ç›‘å¬åˆ°ç™»é™†æŒ‰é”®åï¼Œå¯åŠ¨åå°Serviceå’ŒReceiverï¼Œåœ¨ç™»é™†æˆåŠŸåè·³è½¬åˆ°ClientMainActivityçš„ä¸»æ§ç•Œé¢
  *       
- * @Function List:
- *      1. void onCreate 					//³õÊ¼»¯×é¼ş£¬²¢ÇÒ×¼±¸dialog
- *      2. LoginButtonListener  			//¼àÌıµÇÂ¼½¨£¬¶¯Ì¬×¢²áReceiver£¬²¢ÇÒÆô¶¯ºóÌ¨Service·şÎñ
- *      3. Runnable loginOvertimeRunnable 	//ÓÃÓÚÁ¬½Ó³¬Ê±Ê±ºò¹Ø±Õdialog
- *      4. AuthReceiver         			//½ÓÊÕ¹ã²¥£¬´¦ÀíµÇÂ½³É¹¦ºÍµÇÂ¼Ê§°ÜµÄÇé¿ö¡£
- *      5. void onDestroy()     			//½â³ıReceiver£¬²¢ÇÒ¹Ø±ÕºóÌ¨·şÎñ
+ * @FunctionList:
+ *      1. void onCreate 					//åˆå§‹åŒ–ç»„ä»¶ï¼Œå¹¶ä¸”å‡†å¤‡dialog
+ *      2. LoginButtonListener  			//ç›‘å¬ç™»å½•å»ºï¼ŒåŠ¨æ€æ³¨å†ŒReceiverï¼Œå¹¶ä¸”å¯åŠ¨åå°ServiceæœåŠ¡
+ *      3. Runnable loginOvertimeRunnable 	//ç”¨äºè¿æ¥è¶…æ—¶æ—¶å€™å…³é—­dialog
+ *      4. AuthReceiver         			//æ¥æ”¶å¹¿æ’­ï¼Œå¤„ç†ç™»é™†æˆåŠŸå’Œç™»å½•å¤±è´¥çš„æƒ…å†µã€‚
+ *      5. void onDestroy()     			//è§£é™¤Receiverï¼Œå¹¶ä¸”å…³é—­åå°æœåŠ¡
  * @history:
- *    v1.0 Íê³É»ù´¡µÇÂ¼µÄ¹¦ÄÜ
+ *    v1.0 å®ŒæˆåŸºç¡€ç™»å½•çš„åŠŸèƒ½
  **/
 
 public class ClientActivity extends Activity {
@@ -53,29 +53,29 @@ public class ClientActivity extends Activity {
 	private Button client_login, client_bluetooth;
 	private BottomBarPanel bottomBarPanel;
 	
-	private String accountString;     //ÕË»§
-	private String passwordString;    //ÃÜÂë
+	private String accountString;     //è´¦æˆ·
+	private String passwordString;    //å¯†ç 
 	private Boolean isAuthed = false;
 	private String AUTH_ACTION = "android.intent.action.ANSWER";
 	
 	private Handler handler = new Handler();
-	private AuthReceiver authReceiver;//¹ã²¥½ÓÊÕÆ÷
-	private ProgressDialog dialog; //µÇÂ¼µÄ½ø¶ÈÌõ
-	private boolean firstSwitch = true;//µÚÒ»´Î×ª»»µ½ClientMainActivity£¬²ÅĞèÒªË¢ĞÂ½çÃæ,
-									//¿ÉÄÜÍ¬Ê±ÊÕµ½¶à¸öµÇÂ½³É¹¦¹ã²¥£¬µ¼ÖÂ¶à´ÎÇĞ»»
+	private AuthReceiver authReceiver;//å¹¿æ’­æ¥æ”¶å™¨
+	private ProgressDialog dialog; //ç™»å½•çš„è¿›åº¦æ¡
+	private boolean firstSwitch = true;//ç¬¬ä¸€æ¬¡è½¬æ¢åˆ°ClientMainActivityï¼Œæ‰éœ€è¦åˆ·æ–°ç•Œé¢,
+									//å¯èƒ½åŒæ—¶æ”¶åˆ°å¤šä¸ªç™»é™†æˆåŠŸå¹¿æ’­ï¼Œå¯¼è‡´å¤šæ¬¡åˆ‡æ¢
 	
-	private Intent serviceIntent; //·şÎñIntent
-	private WifiManager wifiManager; //ÓÅÏÈ¿ªÆôwifiÄ£Ê½
-	private Toast toast;             //×Ô¶¨ÒåToast
-	//IHomeService.ServiceBinder serviceBinder;//IHomeServiceÖĞµÄbinder
+	private Intent serviceIntent; //æœåŠ¡Intent
+	private WifiManager wifiManager; //ä¼˜å…ˆå¼€å¯wifiæ¨¡å¼
+	private Toast toast;             //è‡ªå®šä¹‰Toast
+	//IHomeService.ServiceBinder serviceBinder;//IHomeServiceä¸­çš„binder
 	
 	/**
 	 *  @Function:void onCreate
 	 *  @author:Feather Hunter
 	 *  @Description:
-	 *  	»ñµÃ¸÷¸ö×é¼şID£¬²¢ÇÒ³õÊ¼»¯dialog£¨ÓÃÓÚµÇÂ¼£©
+	 *  	è·å¾—å„ä¸ªç»„ä»¶IDï¼Œå¹¶ä¸”åˆå§‹åŒ–dialogï¼ˆç”¨äºç™»å½•ï¼‰
 	 *  @calls:
-	 *     1. new LoginButtonListener(); //µÇÂ¼¼ü¼àÌı
+	 *     1. new LoginButtonListener(); //ç™»å½•é”®ç›‘å¬
 	 *  @Input:
 	 *  @Return:
 	 */
@@ -93,18 +93,18 @@ public class ClientActivity extends Activity {
 		client_bluetooth.setOnClickListener(new BluetoothButtonListener());
 
 		wifiManager = (WifiManager) ClientActivity.this.getSystemService(Service.WIFI_SERVICE);
-		if(wifiManager.getWifiState() != WifiManager.WIFI_STATE_ENABLED)//wifiÃ»ÓĞ´ò¿ª
+		if(wifiManager.getWifiState() != WifiManager.WIFI_STATE_ENABLED)//wifiæ²¡æœ‰æ‰“å¼€
 		{
 			wifiManager.setWifiEnabled(true);
 		}
-		toast = Toast.makeText(getApplicationContext(), "tip:ºÍÖÕ¶ËÔÚÍ¬Ò»WIFIÄÚ²»ÏûºÄÄúµÄÁ÷Á¿", Toast.LENGTH_LONG);
+		toast = Toast.makeText(getApplicationContext(), "tip:å’Œç»ˆç«¯åœ¨åŒä¸€WIFIå†…ä¸æ¶ˆè€—æ‚¨çš„æµé‡", Toast.LENGTH_LONG);
 		toast.setGravity(Gravity.TOP, 0, 0);
 		toast.show();
-		//Toast.makeText(ClientActivity.this, "tip:ºÍÖÕ¶ËÔÚÍ¬Ò»WIFIÄÚ²»ÏûºÄÄúµÄÁ÷Á¿", Toast.LENGTH_LONG).show();
+		//Toast.makeText(ClientActivity.this, "tip:å’Œç»ˆç«¯åœ¨åŒä¸€WIFIå†…ä¸æ¶ˆè€—æ‚¨çš„æµé‡", Toast.LENGTH_LONG).show();
 		/* connect server */
 		dialog = new ProgressDialog(this);
-		dialog.setTitle("ÌáÊ¾");
-		dialog.setMessage("ÕıÔÚµÇÂ¼ÖĞ...");
+		dialog.setTitle("æç¤º");
+		dialog.setMessage("æ­£åœ¨ç™»å½•ä¸­...");
 		dialog.setCancelable(false);
 
 	}
@@ -112,9 +112,9 @@ public class ClientActivity extends Activity {
 	 *  @Class:LoginButtonListener
 	 *  @author:Feather Hunter
 	 *  @Description:
-	 *  	µÇÂ¼°´¼ü¼àÌı£¬¶¯Ì¬×¢²áauthReceiverÓÃÓÚ½ÓÊÜºóÌ¨Service·¢ËÍµÄ¹ã²¥
-	 *  	Æô¶¯ÁËService²¢ÇÒÏÔÊ¾ÁËdialog£¬¿ªÆôÁË³¬ÊĞµ¹¼ÆÊ±¼ÆÊıÆ÷¡£ÔÚÒ»¶¨Ê±¼ä
-	 *  	ÄÚÎ´µÇÂ¼³É¹¦£¬»áÌáÊ¾Ê§°Ü¡£
+	 *  	ç™»å½•æŒ‰é”®ç›‘å¬ï¼ŒåŠ¨æ€æ³¨å†ŒauthReceiverç”¨äºæ¥å—åå°Serviceå‘é€çš„å¹¿æ’­
+	 *  	å¯åŠ¨äº†Serviceå¹¶ä¸”æ˜¾ç¤ºäº†dialogï¼Œå¼€å¯äº†è¶…å¸‚å€’è®¡æ—¶è®¡æ•°å™¨ã€‚åœ¨ä¸€å®šæ—¶é—´
+	 *  	å†…æœªç™»å½•æˆåŠŸï¼Œä¼šæç¤ºå¤±è´¥ã€‚
 	 */
     class LoginButtonListener implements OnClickListener
     {
@@ -124,22 +124,22 @@ public class ClientActivity extends Activity {
     		accountString = client_account.getText().toString();
     		passwordString = client_password.getText().toString();
     		
-    		/*¶¯Ì¬×¢²áreceiver*/
+    		/*åŠ¨æ€æ³¨å†Œreceiver*/
     		authReceiver = new AuthReceiver();
     		IntentFilter filter = new IntentFilter();
     		filter.addAction(AUTH_ACTION);
-    		registerReceiver(authReceiver, filter);//×¢²á
+    		registerReceiver(authReceiver, filter);//æ³¨å†Œ
     		
-    		/*°ó¶¨service, ÀûÓÃconnection½¨Á¢ÓëserviceµÄÁªÏµ*/
+    		/*ç»‘å®šservice, åˆ©ç”¨connectionå»ºç«‹ä¸serviceçš„è”ç³»*/
     		serviceIntent = new Intent();
     		serviceIntent.putExtra("command", "auth");
     		serviceIntent.putExtra("account", accountString);
     		serviceIntent.putExtra("password", passwordString);
     		serviceIntent.setClass(ClientActivity.this, IHomeService.class);
-    		//bindService(serviceIntent, connection, BIND_AUTO_CREATE); //°ó¶¨service,²¢ÇÒ×Ô¶¯´´½¨service
-    		startService(serviceIntent); //¿ªÆô·şÎñ
-    		dialog.show(); //ÏÔÊ¾µÇÂ½½ø¶ÈÌõ
-    		/*³¬Ê±´¦Àí*/
+    		//bindService(serviceIntent, connection, BIND_AUTO_CREATE); //ç»‘å®šservice,å¹¶ä¸”è‡ªåŠ¨åˆ›å»ºservice
+    		startService(serviceIntent); //å¼€å¯æœåŠ¡
+    		dialog.show(); //æ˜¾ç¤ºç™»é™†è¿›åº¦æ¡
+    		/*è¶…æ—¶å¤„ç†*/
     		Thread thread = new Thread(loginOvertimeRunnable);
     		thread.start();
     	}	
@@ -151,7 +151,7 @@ public class ClientActivity extends Activity {
     	public void onClick(View v) {
     		Intent intent = new Intent();
 			
-			intent.putExtra("mode", 2);//Ñ¡ÔñÄ£Ê½£º2ÎªÀ¶ÑÀÄ£Ê½
+			intent.putExtra("mode", 2);//é€‰æ‹©æ¨¡å¼ï¼š2ä¸ºè“ç‰™æ¨¡å¼
     		intent.putExtra("account", client_account.getText().toString());
             intent.setClass(ClientActivity.this, ClientMainActivity.class);
             ClientActivity.this.startActivity(intent);
@@ -161,7 +161,7 @@ public class ClientActivity extends Activity {
     /**
 	 *  @Object: loginOvertimeRunnable
 	 *  @Description:
-	 *  	Æô¶¯µÇÂ½ºóµÄ¼ÆÊ±¹¦ÄÜ£¬ÔÚÒ»¶¨Ê±¼äÄÚÃ»ÓĞÁ¬½Ó³É¹¦ÔòÒ»¶¨Ê§°ÜÁË
+	 *  	å¯åŠ¨ç™»é™†åçš„è®¡æ—¶åŠŸèƒ½ï¼Œåœ¨ä¸€å®šæ—¶é—´å†…æ²¡æœ‰è¿æ¥æˆåŠŸåˆ™ä¸€å®šå¤±è´¥äº†
 	 */
     Runnable loginOvertimeRunnable = new Runnable() {
 		
@@ -169,7 +169,7 @@ public class ClientActivity extends Activity {
 		public void run() {
 			// TODO Auto-generated method stub
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -182,13 +182,13 @@ public class ClientActivity extends Activity {
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
-						Toast.makeText(ClientActivity.this, "µÇÂ½³¬Ê±", Toast.LENGTH_SHORT).show();
+						Toast.makeText(ClientActivity.this, "ç™»é™†è¶…æ—¶", Toast.LENGTH_SHORT).show();
 						
 			    		serviceIntent = new Intent();
 			    		serviceIntent.putExtra("command", "stop");
 			    		serviceIntent.setClass(ClientActivity.this, IHomeService.class);
-			    		startService(serviceIntent); //·¢ËÍÍ£Ö¹Ö¸Áî
-			    		stopService(serviceIntent);  //¹Ø±ÕºóÌ¨Á¬½Ó·şÎñ
+			    		startService(serviceIntent); //å‘é€åœæ­¢æŒ‡ä»¤
+			    		stopService(serviceIntent);  //å…³é—­åå°è¿æ¥æœåŠ¡
 					}
 				});
 			}
@@ -199,14 +199,14 @@ public class ClientActivity extends Activity {
 	/**
 	 *  @Class: AuthReceiver
 	 *  @Description:
-	 *  	ÈôµÇÂ½³É¹¦,·¢ËÍµÇÂ¼Ä£Ê½¸øClientMainActivity,²¢ÇÒÇĞ»»µ½ClientMainActivity
+	 *  	è‹¥ç™»é™†æˆåŠŸ,å‘é€ç™»å½•æ¨¡å¼ç»™ClientMainActivity,å¹¶ä¸”åˆ‡æ¢åˆ°ClientMainActivity
 	 */
 	private class AuthReceiver extends BroadcastReceiver{
 
-		int failed_conter; //¶à´Î½Óµ½Ê§°ÜĞÅÏ¢Ö»ÏÔÊ¾Ò»´Î
+		int failed_conter; //å¤šæ¬¡æ¥åˆ°å¤±è´¥ä¿¡æ¯åªæ˜¾ç¤ºä¸€æ¬¡
 		public AuthReceiver() {
 			// TODO Auto-generated constructor stub
-			failed_conter = 0; //³õÊ¼»¯
+			failed_conter = 0; //åˆå§‹åŒ–
 		}
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -218,26 +218,26 @@ public class ClientActivity extends Activity {
 					{
 						if(firstSwitch == false) return;
 						firstSwitch = false;
-						/*ÇĞ»»µ½Ö÷¿Ø½çÃæ*/
+						/*åˆ‡æ¢åˆ°ä¸»æ§ç•Œé¢*/
 			    		Intent intentMain = new Intent();
 						
-			    		intentMain.putExtra("mode", 1);//Ñ¡ÔñÄ£Ê½£º1Îªserver Mode
+			    		intentMain.putExtra("mode", 1);//é€‰æ‹©æ¨¡å¼ï¼š1ä¸ºserver Mode
 			    		intentMain.putExtra("account", client_account.getText().toString());
 			    		intentMain.setClass(ClientActivity.this, ClientMainActivity.class);
 			            ClientActivity.this.startActivity(intentMain);
 			            isAuthed = true;
-			            failed_conter = 0; //Çå³ıÊ§°ÜÏÔÊ¾¼ÆÊıÆ÷
+			            failed_conter = 0; //æ¸…é™¤å¤±è´¥æ˜¾ç¤ºè®¡æ•°å™¨
 						
 					}else{
 						if(failed_conter == 0)
 						{
-							Toast.makeText(ClientActivity.this, "Á¬½Ó·şÎñÆ÷Ê§°Ü,µã»÷help»ñµÃ°ïÖú", Toast.LENGTH_SHORT).show();
+							Toast.makeText(ClientActivity.this, "è¿æ¥æœåŠ¡å™¨å¤±è´¥,ç‚¹å‡»helpè·å¾—å¸®åŠ©", Toast.LENGTH_SHORT).show();
 						}
 						failed_conter++;
 						if(failed_conter == 10) failed_conter = 0;
 					}
 
-					dialog.dismiss(); //µÇÂ½³É¹¦£¬½â³ı½ø¶ÈÌõ
+					dialog.dismiss(); //ç™»é™†æˆåŠŸï¼Œè§£é™¤è¿›åº¦æ¡
 				}
 				else if (resultString.equals("center")){
 					
@@ -245,30 +245,30 @@ public class ClientActivity extends Activity {
 					{
 						if(firstSwitch == false) return;
 						firstSwitch = false;
-						/*ÇĞ»»µ½Ö÷¿Ø½çÃæ*/
+						/*åˆ‡æ¢åˆ°ä¸»æ§ç•Œé¢*/
 			    		Intent intentMain = new Intent();
 						
-			    		intentMain.putExtra("mode", 2);//Ñ¡ÔñÄ£Ê½£º1Îªserver Mode
+			    		intentMain.putExtra("mode", 2);//é€‰æ‹©æ¨¡å¼ï¼š1ä¸ºserver Mode
 			    		intentMain.putExtra("account", client_account.getText().toString());
 			    		intentMain.setClass(ClientActivity.this, ClientMainActivity.class);
 			            ClientActivity.this.startActivity(intentMain);
 			            isAuthed = true;
-			            failed_conter = 0; //Çå³ıÊ§°ÜÏÔÊ¾¼ÆÊıÆ÷
+			            failed_conter = 0; //æ¸…é™¤å¤±è´¥æ˜¾ç¤ºè®¡æ•°å™¨
 						
 					}else{
 						if(failed_conter == 0)
 						{
-							Toast.makeText(ClientActivity.this, "Á¬½ÓCenterÊ§°Ü,µã»÷help»ñµÃ°ïÖú", Toast.LENGTH_SHORT).show();
+							Toast.makeText(ClientActivity.this, "è¿æ¥Centerå¤±è´¥,ç‚¹å‡»helpè·å¾—å¸®åŠ©", Toast.LENGTH_SHORT).show();
 						}
 						failed_conter++;
 						if(failed_conter == 10) failed_conter = 0;
 					}
-					dialog.dismiss(); //µÇÂ½Ê§°Ü£¬½â³ı½ø¶ÈÌõ
+					dialog.dismiss(); //ç™»é™†å¤±è´¥ï¼Œè§£é™¤è¿›åº¦æ¡
 
 				}
 				else if(resultString.equals("relogin"))
 				{
-					/*Òª¿ªÊ¼ÖØĞÂµÇÂ¼*/
+					/*è¦å¼€å§‹é‡æ–°ç™»å½•*/
 					System.out.println("relogin");
 					firstSwitch = true;
 				}
@@ -278,9 +278,9 @@ public class ClientActivity extends Activity {
 	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-    	menu.add(0, 0, 0, "ÍË³ö");
-    	menu.add(1, 1, 1, "ÉèÖÃ");
-    	menu.add(2, 2, 2, "°ïÖú");
+    	menu.add(0, 0, 0, "é€€å‡º");
+    	menu.add(1, 1, 1, "è®¾ç½®");
+    	menu.add(2, 2, 2, "å¸®åŠ©");
         //getMenuInflater().inflate(R.menu.client, menu);
         return true;
     }
@@ -295,12 +295,12 @@ public class ClientActivity extends Activity {
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		unregisterReceiver(authReceiver); //½â³ıreceiverµÄ×¢²á
-		/*Í£Ö¹ºóÌ¨·şÎñ*/
+		unregisterReceiver(authReceiver); //è§£é™¤receiverçš„æ³¨å†Œ
+		/*åœæ­¢åå°æœåŠ¡*/
 		Intent serviceIntent = new Intent();
 		serviceIntent.setClass(ClientActivity.this, IHomeService.class);
 		stopService(serviceIntent);
-		//unbindService(connection);//½â³ı°ó¶¨
+		//unbindService(connection);//è§£é™¤ç»‘å®š
 	}
     
     

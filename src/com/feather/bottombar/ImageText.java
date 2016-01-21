@@ -17,8 +17,8 @@ public class ImageText extends LinearLayout{
     private TextView mTextView = null;  
     private final static int DEFAULT_IMAGE_WIDTH = 64;  
     private final static int DEFAULT_IMAGE_HEIGHT = 64;  
-    private int CHECKED_COLOR = Color.rgb(29, 118, 199); //选中蓝色  
-    private int UNCHECKED_COLOR = Color.GRAY;   //自然灰色  
+    private int CHECKED_COLOR = Color.rgb(29, 118, 199); //閫変腑钃濊壊  
+    private int UNCHECKED_COLOR = Color.GRAY;   //鑷劧鐏拌壊  
     public ImageText(Context context) {  
         super(context);  
         // TODO Auto-generated constructor stub  

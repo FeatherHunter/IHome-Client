@@ -51,15 +51,15 @@ public class BottomBarPanel extends RelativeLayout implements View.OnClickListen
 		}
 		if(mContactsBtn != null){
 			mContactsBtn.setImage(R.drawable.setting_unselected);
-			mContactsBtn.setText("Ò£¿Ø");
+			mContactsBtn.setText("é¥æ§");
 		}
 		if(mNewsBtn != null){
 			mNewsBtn.setImage(R.drawable.contacts_unselected);
-			mNewsBtn.setText("ÊÓÆµ");
+			mNewsBtn.setText("è§†é¢‘");
 		}
 		if(mSettingBtn != null){
 			mSettingBtn.setImage(R.drawable.message_unselected);
-			mSettingBtn.setText("¿Í·ş");
+			mSettingBtn.setText("å®¢æœ");
 		}
 		setBtnListener();
 	} 
@@ -114,7 +114,7 @@ public class BottomBarPanel extends RelativeLayout implements View.OnClickListen
         super.onLayout(changed, left, top, right, bottom);  
         layoutItems(left, top, right, bottom);  
     }  
-    /**×î×ó±ßºÍ×îÓÒ±ßµÄviewÓÉÄ¸²¼¾ÖµÄpadding½øĞĞ¿ØÖÆÎ»ÖÃ¡£ÕâÀïĞè¶ÔµÚ2¡¢3¸öviewµÄÎ»ÖÃÖØĞÂÉèÖÃ 
+    /**æœ€å·¦è¾¹å’Œæœ€å³è¾¹çš„viewç”±æ¯å¸ƒå±€çš„paddingè¿›è¡Œæ§åˆ¶ä½ç½®ã€‚è¿™é‡Œéœ€å¯¹ç¬¬2ã€3ä¸ªviewçš„ä½ç½®é‡æ–°è®¾ç½® 
      * @param left 
      * @param top 
      * @param right 

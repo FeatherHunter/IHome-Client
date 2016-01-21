@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/readme.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/feather/activity/ClientActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/feather/activity/ClientMainActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/feather/activity/Instruction.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/feather/bottombar/BaseFragment.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/feather/bottombar/BottomBarPanel.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/feather/bottombar/Constant.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/feather/bottombar/ImageText.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/feather/fragment/FragmentIHome.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/feather/fragment/FragmentVideo.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/feather/service/IHomeService.java" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>

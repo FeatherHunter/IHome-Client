@@ -1,17 +1,17 @@
 package com.feather.bottombar;
 
 public class Constant {  
-    //BtnµÄ±êÊ¶  
+    //Btnçš„æ ‡è¯†  
     public static final int BTN_FLAG_IHOME    = 0x01;  
     public static final int BTN_FLAG_CONTRL   = 0x01 << 1;  
     public static final int BTN_FLAG_VIDEO    = 0x01 << 2;  
     public static final int BTN_FLAG_CSERVICE = 0x01 << 3;  
       
-    //FragmentµÄ±êÊ¶  
+    //Fragmentçš„æ ‡è¯†  
     public static final String FRAGMENT_FLAG_IHOME = "IHome";   
-    public static final String FRAGMENT_FLAG_CONTRL = "Ò£¿Ø";   
-    public static final String FRAGMENT_FLAG_VIDEO = "ÊÓÆµ";   
-    public static final String FRAGMENT_FLAG_CSERVICE = "¿Í·þ";   
+    public static final String FRAGMENT_FLAG_CONTRL = "é¥æŽ§";   
+    public static final String FRAGMENT_FLAG_VIDEO = "è§†é¢‘";   
+    public static final String FRAGMENT_FLAG_CSERVICE = "å®¢æœ";   
     public static final String FRAGMENT_FLAG_SIMPLE = "simple";   
       
       

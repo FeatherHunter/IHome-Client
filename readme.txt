@@ -1,30 +1,30 @@
-Copyright °æÈ¨ËùÓĞ @IFuture Technology
-±¾ÏîÄ¿ÊÇIFuture¿Æ¼¼¹«Ë¾(intelligent future technolgy)ÆìÏÂIHome(ÖÇÄÜ¼ÒÍ¥)ÏîÄ¿ÖĞ ÓÃ»§AndroidµÄAPP
-»ùÓÚAndroid
+Copyright ç‰ˆæƒæ‰€æœ‰ @IFuture Technology
+æœ¬é¡¹ç›®æ˜¯IFutureç§‘æŠ€å…¬å¸(intelligent future technolgy)æ——ä¸‹IHome(æ™ºèƒ½å®¶åº­)é¡¹ç›®ä¸­ ç”¨æˆ·Androidçš„APP
+åŸºäºAndroid
 
-1.ÏîÄ¿¸ºÔğÈË:feather(Íõ³½ºÆ)
-2.ÏîÄ¿ÎÄ¼şÖ¸Òı:
-  °ü
+1.é¡¹ç›®è´Ÿè´£äºº:feather(ç‹è¾°æµ©)
+2.é¡¹ç›®æ–‡ä»¶æŒ‡å¼•:
+  åŒ…
   1.com.feather.activity           
-		   ClientActivity.java     µÇÂ½½çÃæ
-		   ClientMainActivity.java µÇÂ½³É¹¦ºó¿ØÖÆ½çÃæ
-                   Instructions.Java       ×Ô¶¨ÒåÍ¨ĞÅĞ­ÒéÖ¸Áî
-  2.com.feather.bottombar   APPÏÂ·½ÇĞ»»½çÃæÀ¸
-		   BaseFragment.java       ËùÓĞFragment¸¸Àà
-		   BottomBarPanel.java     µÍÀ¸          
+		   ClientActivity.java     ç™»é™†ç•Œé¢
+		   ClientMainActivity.java ç™»é™†æˆåŠŸåæ§åˆ¶ç•Œé¢
+                   Instructions.Java       è‡ªå®šä¹‰é€šä¿¡åè®®æŒ‡ä»¤
+  2.com.feather.bottombar   APPä¸‹æ–¹åˆ‡æ¢ç•Œé¢æ 
+		   BaseFragment.java       æ‰€æœ‰Fragmentçˆ¶ç±»
+		   BottomBarPanel.java     ä½æ           
   3.com.feather.fragment
-		   FragmentIHome.java      ÖÇÄÜ¼Ò¾ÓÖ÷¿Ø½çÃæFragment
-	           FragmentVideo.java      ÊÓÆµ½çÃæµÄFragment
+		   FragmentIHome.java      æ™ºèƒ½å®¶å±…ä¸»æ§ç•Œé¢Fragment
+	           FragmentVideo.java      è§†é¢‘ç•Œé¢çš„Fragment
   4.com.feather.service
-		   IHomeService.java       ºóÌ¨·şÎñÓÃÓÚÁ¬½Ó·şÎñÆ÷,stm32£¬ÊÕ·¢ĞÅÏ¢µÈ¡£
+		   IHomeService.java       åå°æœåŠ¡ç”¨äºè¿æ¥æœåŠ¡å™¨,stm32ï¼Œæ”¶å‘ä¿¡æ¯ç­‰ã€‚
 
-3.°æ±¾ĞÅÏ¢Óë¹¦ÄÜ½éÉÜ:
+3.ç‰ˆæœ¬ä¿¡æ¯ä¸åŠŸèƒ½ä»‹ç»:
 
-v2.0  @Date:2015/12/27  ÄÜ½øĞĞ»ù´¡µÄ¿ØÖÆ£¬µÆºÍÊª¶È¡£
-v2.10 @Date:2016/1/2    ĞŞ¸´ÁËÊÖ»ú´ı»ú³ÌĞò×Ô¶¯±ÀÀ£µÄÖØ´óBUG£¬ĞŞ¸´ÁËµÇÂ½½çÃæºÍ¿ØÖÆ½çÃæÀ´»Ø¶à´ÎÇĞ»»ÏÔÊ¾²»ÕıÈ·µÄBUG¡£
-v2.20 @Date:2016/1/18   Ôö¼ÓÁËwifiÄ£Ê½£¬Ò²Ö§³ÖwifiÄ£Ê½ºÍÒÔÌ«ÍøÄ£Ê½¼äÈ´»»
+v2.0  @Date:2015/12/27  èƒ½è¿›è¡ŒåŸºç¡€çš„æ§åˆ¶ï¼Œç¯å’Œæ¹¿åº¦ã€‚
+v2.10 @Date:2016/1/2    ä¿®å¤äº†æ‰‹æœºå¾…æœºç¨‹åºè‡ªåŠ¨å´©æºƒçš„é‡å¤§BUGï¼Œä¿®å¤äº†ç™»é™†ç•Œé¢å’Œæ§åˆ¶ç•Œé¢æ¥å›å¤šæ¬¡åˆ‡æ¢æ˜¾ç¤ºä¸æ­£ç¡®çš„BUGã€‚
+v2.20 @Date:2016/1/18   å¢åŠ äº†wifiæ¨¡å¼ï¼Œä¹Ÿæ”¯æŒwifiæ¨¡å¼å’Œä»¥å¤ªç½‘æ¨¡å¼é—´å´æ¢
 
 
-4.¹¤×÷Íê³ÉµÄ´úÂëÁ¿
+4.å·¥ä½œå®Œæˆçš„ä»£ç é‡
 
-feather£¨Íõ³½ºÆ£©¹±Ï×´úÂëÁ¿£º3210ĞĞ
+featherï¼ˆç‹è¾°æµ©ï¼‰è´¡çŒ®ä»£ç é‡ï¼š3210è¡Œ

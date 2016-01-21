@@ -101,7 +101,7 @@ public class BaseFragment extends Fragment {
 		if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_IHOME)){
 			baseFragment = new FragmentIHome();
 		}
-		else if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_VIDEO)){//ÊÓÆµ
+		else if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_VIDEO)){//è§†é¢‘
 			baseFragment = new FragmentVideo();
 		}
 		/*

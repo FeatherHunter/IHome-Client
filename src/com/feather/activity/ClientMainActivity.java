@@ -41,40 +41,40 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /** 
- * @CopyRight: Íõ³½ºÆ 2015~2025
- * @Author Feather Hunter(ÁÔÓğ)
- * @qq:975559549
- * @Version:2.10 
- * @Date:2015/12/25
- * @Description: µÇÂ½Ö®ºóµÄ¿ØÖÆÖ÷½çÃæ¡£ÓÃÓÚ¼¸¸öÒ³ÃæËéÆ¬(fragment)µÄÇĞ»»¡£²¢ÇÒÓëºóÌ¨Service½øĞĞ½»»¥£¬À´Íê³É¸÷ÖÖ¿ØÖÆ¹¦ÄÜ¡£
- *        ÏêÏ¸ÏîÄ¿½éÉÜ£º
- *        1.onCreate³õÊ¼»¯ÁËUI½çÃæ£¬¶¯Ì¬×¢²áÁË¹ã²¥½ÓÊÕÆ÷ÓÃÓÚ½ÓÊÜºóÌ¨Service·¢À´µÄĞÅÏ¢
- *        2.Í¨¹ıµ×²¿µÄ°´Å¥,ÇĞ»»¼¸¸öfragment(Ò³Ãæ)
- *        3.Èç¹û°´ÏÂÁË·µ»Ø¼ü£¬»áµ÷ÓÃonKeyDownº¯Êı½øĞĞ´¦Àí£º½â³ı×¢²áµÄReceiverºÍ·¢ËÍ¡°Á¬½ÓÖĞ¶Ï¡±¸øService¡£²¢ÇÒ·µ»Øµ½ClientActivity
- *        4.ReceiverµÈ´ıServiceµÄ¹ã²¥£¬²¢½«´¦ÀíµÄ½á¹ûÍ¨¹ısetHandler·¢ËÍ¸øFragmentIHome½øĞĞÏàÓ¦µÄÏÔÊ¾¡£
- *        5.ÈçÏÂ·½·¨ÁĞ±íÖĞ4~10ÓÃÓÚÇĞ»»¶à¸öFragment
+ * @CopyRight: ç‹è¾°æµ© 2015~2025
+ * @Author Feather Hunter(çŒç¾½)
+ * @qq: 975559549
+ * @Version: 2.10
+ * @Date: 2015/12/25
+ * @Description: ç™»é™†ä¹‹åçš„æ§åˆ¶ä¸»ç•Œé¢ã€‚ç”¨äºå‡ ä¸ªé¡µé¢ç¢ç‰‡(fragment)çš„åˆ‡æ¢ã€‚å¹¶ä¸”ä¸åå°Serviceè¿›è¡Œäº¤äº’ï¼Œæ¥å®Œæˆå„ç§æ§åˆ¶åŠŸèƒ½ã€‚
+ *        è¯¦ç»†é¡¹ç›®ä»‹ç»ï¼š
+ *        1.onCreateåˆå§‹åŒ–äº†UIç•Œé¢ï¼ŒåŠ¨æ€æ³¨å†Œäº†å¹¿æ’­æ¥æ”¶å™¨ç”¨äºæ¥å—åå°Serviceå‘æ¥çš„ä¿¡æ¯
+ *        2.é€šè¿‡åº•éƒ¨çš„æŒ‰é’®,åˆ‡æ¢å‡ ä¸ªfragment(é¡µé¢)
+ *        3.å¦‚æœæŒ‰ä¸‹äº†è¿”å›é”®ï¼Œä¼šè°ƒç”¨onKeyDownå‡½æ•°è¿›è¡Œå¤„ç†ï¼šè§£é™¤æ³¨å†Œçš„Receiverå’Œå‘é€â€œè¿æ¥ä¸­æ–­â€ç»™Serviceã€‚å¹¶ä¸”è¿”å›åˆ°ClientActivity
+ *        4.Receiverç­‰å¾…Serviceçš„å¹¿æ’­ï¼Œå¹¶å°†å¤„ç†çš„ç»“æœé€šè¿‡setHandlerå‘é€ç»™FragmentIHomeè¿›è¡Œç›¸åº”çš„æ˜¾ç¤ºã€‚
+ *        5.å¦‚ä¸‹æ–¹æ³•åˆ—è¡¨ä¸­4~10ç”¨äºåˆ‡æ¢å¤šä¸ªFragment
  *        
- *        Í¨¹ıµ×²¿À¸½øĞĞfragmentÇĞ»»µÄÏêÏ¸½²½â£º
- *        1. ËùÓĞfragment¶¼ÊÇBaseFragmentµÄ×ÓÀà¡£getFragment()ÓÃÓÚÍ¨¹ıBasement»ñµÃÏàÓ¦µÄ×Ófragment,ËùÒÔÔÚBasementµÄ
- *           newInstance·½·¨ÖĞĞèÒª±àĞ´ÏàÓ¦´úÂë¡£¾ßÌåÄÚÈİ¿´Ò»ÏÂClientMainActivityµÄgetFragment·½·¨ºÍBasementµÄnewInstance
- *           ·½·¨ÄÚÈİ¾Í¿ÉÒÔÃ÷°×ÁË¡£¾ßÌåÇë×ÉÑ¯qq975559549
+ *        é€šè¿‡åº•éƒ¨æ è¿›è¡Œfragmentåˆ‡æ¢çš„è¯¦ç»†è®²è§£ï¼š
+ *        1. æ‰€æœ‰fragmentéƒ½æ˜¯BaseFragmentçš„å­ç±»ã€‚getFragment()ç”¨äºé€šè¿‡Basementè·å¾—ç›¸åº”çš„å­fragment,æ‰€ä»¥åœ¨Basementçš„
+ *           newInstanceæ–¹æ³•ä¸­éœ€è¦ç¼–å†™ç›¸åº”ä»£ç ã€‚å…·ä½“å†…å®¹çœ‹ä¸€ä¸‹ClientMainActivityçš„getFragmentæ–¹æ³•å’ŒBasementçš„newInstance
+ *           æ–¹æ³•å†…å®¹å°±å¯ä»¥æ˜ç™½äº†ã€‚å…·ä½“è¯·å’¨è¯¢qq975559549
  *       
  * @Function List:
- *      1. void onCreate 		//ÅĞ¶Ïµ±Ç°µÄ¹¤×÷Ä£Ê½,¶¯Ì¬×¢²á¹ã²¥½ÓÊÕÆ÷
- *      2. class ContrlReceiver //½ÓÊÕÆ÷,¸üĞÂÎÂ¶ÈµÈÊı¾İĞÅÏ¢,ÏÔÊ¾Á¬½ÓºÍÈÏÖ¤ĞÅÏ¢
- *      3. void initUI() 		//³õÊ¼»¯½çÃæ
- *      4. void setTabSelection //¿ªÆôÒ»¸öFragmentÊÂÎñ,²¢ÇĞ»»Fragment
- *      5. void switchFragment  //ÇĞ»»Fragment
+ *      1. void onCreate 		//åˆ¤æ–­å½“å‰çš„å·¥ä½œæ¨¡å¼,åŠ¨æ€æ³¨å†Œå¹¿æ’­æ¥æ”¶å™¨
+ *      2. class ContrlReceiver //æ¥æ”¶å™¨,æ›´æ–°æ¸©åº¦ç­‰æ•°æ®ä¿¡æ¯,æ˜¾ç¤ºè¿æ¥å’Œè®¤è¯ä¿¡æ¯
+ *      3. void initUI() 		//åˆå§‹åŒ–ç•Œé¢
+ *      4. void setTabSelection //å¼€å¯ä¸€ä¸ªFragmentäº‹åŠ¡,å¹¶åˆ‡æ¢Fragment
+ *      5. void switchFragment  //åˆ‡æ¢Fragment
  *      6. void attachFragment  
  *      7. void commitTransactions 
  *      8. void setDefaultFirstFragment
  *      9. FragmentTransaction ensureTransaction
  *      10.Fragment getFragment
  *      11.void detachFragment(Fragment f)
- *      12.void setHandler(Handler handler); //ÓÃÓÚºÍFragmentIHomeÍ¨ĞÅ
- *      13.public boolean onKeyDown(int keyCode, KeyEvent event); //ÓÃÓÚ´¦Àí·µ»Ø¼üµÈ°´ÏÂºóµÄÊ±¼ä
+ *      12.void setHandler(Handler handler); //ç”¨äºå’ŒFragmentIHomeé€šä¿¡
+ *      13.public boolean onKeyDown(int keyCode, KeyEvent event); //ç”¨äºå¤„ç†è¿”å›é”®ç­‰æŒ‰ä¸‹åçš„æ—¶é—´
  * @history:
- *    v2.10 2016/1/8 ½â¾öÁËÊÖ»ú´ı»úµ¼ÖÂ³ÌĞò±ÀÀ£BUG£¬½â¾öÁË·´¸´ÔÚµÇÂ½½çÃæºÍ¿ØÖÆ½çÃæÇĞ»»µ¼ÖÂ¿ØÖÆ½çÃæÏÔÊ¾³ö´íBUG
+ *    v2.10 2016/1/8 è§£å†³äº†æ‰‹æœºå¾…æœºå¯¼è‡´ç¨‹åºå´©æºƒBUGï¼Œè§£å†³äº†åå¤åœ¨ç™»é™†ç•Œé¢å’Œæ§åˆ¶ç•Œé¢åˆ‡æ¢å¯¼è‡´æ§åˆ¶ç•Œé¢æ˜¾ç¤ºå‡ºé”™BUG
  **/
 
 public class ClientMainActivity extends Activity implements BottomPanelCallback {
@@ -91,7 +91,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 	private OutputStream outputStream;
 	private InputStream inputStream;
 	private boolean isConnected = false;
-	char seperator = (char) 31;//31µ¥Ôª·Ö¸ô·û
+	char seperator = (char) 31;//31å•å…ƒåˆ†éš”ç¬¦
 	private ContrlReceiver contrlReceiver;
 	private String CONTRL_ACTION = "android.intent.action.EDIT";
 	
@@ -115,45 +115,44 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 	/**
 	 * @Function: protected void onCreate
 	 * @Description:
-	 *      ClientMainActivity´´½¨ºóµÄ²Ù×÷
-	 *      1.initUI()³õÊ¼»¯UI½çÃæ£¬°üÀ¨µ×²ãÀ¸
-	 *      2.»ñÈ¡´ÓClientActivity´«µİµÄĞÅÏ¢£¬È·¶¨´¦ÓÚÄÚÍøÄ£Ê½»¹ÊÇÍâÍøÄ£Ê½¡£
-	 *      3.¶¯Ì¬×¢²áReceiver(ÓÃÓÚ½«´ÓService½ÓÊÜµÄ½á¹û·¢ËÍ¸øIHome Fragment²¢×ö³öÏàÓ¦¸Ä±ä)
+	 *      ClientMainActivityåˆ›å»ºåçš„æ“ä½œ
+	 *      1.initUI()åˆå§‹åŒ–UIç•Œé¢ï¼ŒåŒ…æ‹¬åº•å±‚æ 
+	 *      2.è·å–ä»ClientActivityä¼ é€’çš„ä¿¡æ¯ï¼Œç¡®å®šå¤„äºå†…ç½‘æ¨¡å¼è¿˜æ˜¯å¤–ç½‘æ¨¡å¼ã€‚
+	 *      3.åŠ¨æ€æ³¨å†ŒReceiver(ç”¨äºå°†ä»Serviceæ¥å—çš„ç»“æœå‘é€ç»™IHome Fragmentå¹¶åšå‡ºç›¸åº”æ”¹å˜)
 	 **/
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_client_main);
-		/*³õÊ¼»¯½çÃæ*/
+		/*åˆå§‹åŒ–ç•Œé¢*/
 		currFragTag = "";
 		initUI();
 		
 		fragmentManager = getFragmentManager();
-		setDefaultFirstFragment(Constant.FRAGMENT_FLAG_VIDEO);
-		//setDefaultFirstFragment(Constant.FRAGMENT_FLAG_IHOME);
+		setDefaultFirstFragment(Constant.FRAGMENT_FLAG_IHOME);
 		
 		Intent intent = getIntent();
-		int mode = intent.getIntExtra("mode", 2); //µÃµ½Ä£Ê½ĞÅÏ¢£¬Ä¬ÈÏÎªÀ¶ÑÀÄ£Ê½2
-		if(mode == 1)//ethnetÄ£Ê½
+		int mode = intent.getIntExtra("mode", 2); //å¾—åˆ°æ¨¡å¼ä¿¡æ¯ï¼Œé»˜è®¤ä¸ºè“ç‰™æ¨¡å¼2
+		if(mode == 1)//ethnetæ¨¡å¼
 		{
-			Toast.makeText(this, "½øÈëÍøÂçÄ£Ê½", Toast.LENGTH_SHORT).show();
-			isConnected = true; //Á¬½Ó³É¹¦
+			Toast.makeText(this, "è¿›å…¥ç½‘ç»œæ¨¡å¼", Toast.LENGTH_SHORT).show();
+			isConnected = true; //è¿æ¥æˆåŠŸ
 
 		}
-		else if(mode == 2)//µ±Ç°´¦ÓÚÄÚÍøÁ¬½Ó¿ØÖÆÖĞĞÄÄ£Ê½
+		else if(mode == 2)//å½“å‰å¤„äºå†…ç½‘è¿æ¥æ§åˆ¶ä¸­å¿ƒæ¨¡å¼
 		{
-			Toast.makeText(this, "½øÈëÄÚÍøÄ£Ê½", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "è¿›å…¥å†…ç½‘æ¨¡å¼", Toast.LENGTH_SHORT).show();
 		}
 		try {
-			/*¶¯Ì¬×¢²áreceiver*/
+			/*åŠ¨æ€æ³¨å†Œreceiver*/
 			contrlReceiver = new ContrlReceiver();
 			IntentFilter filter = new IntentFilter();
 			filter.addAction(CONTRL_ACTION);
-			registerReceiver(contrlReceiver, filter);//×¢²á 
+			registerReceiver(contrlReceiver, filter);//æ³¨å†Œ 
 		} catch (IllegalArgumentException  e) {
 			// TODO: handle exception
 			System.out.println("had been registerReceiver");
 		}
-		/*Ä¬ÈÏ¿ªÆôIHome½çÃæ*/
+		/*é»˜è®¤å¼€å¯IHomeç•Œé¢*/
 		//onBottomPanelClick(Constant.BTN_FLAG_IHOME);
 		System.out.println("onCreate");
 	}
@@ -166,7 +165,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		contrlReceiver = new ContrlReceiver();
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(CONTRL_ACTION);
-		registerReceiver(contrlReceiver, filter);//×¢²á 
+		registerReceiver(contrlReceiver, filter);//æ³¨å†Œ 
 
 		System.out.println("onRestart");
 	}
@@ -183,16 +182,16 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		System.out.println("onPause");
 	}
 
-	/*ÉèÖÃ*/
+	/*è®¾ç½®*/
 	public void setHandler(Handler handler)
 	{
 		communicationHandler = handler;
 	}
-	//½ÓÊÕÆ÷,¸üĞÂÎÂ¶ÈµÈÊı¾İĞÅÏ¢,ÏÔÊ¾Á¬½ÓºÍÈÏÖ¤ĞÅÏ¢
+	//æ¥æ”¶å™¨,æ›´æ–°æ¸©åº¦ç­‰æ•°æ®ä¿¡æ¯,æ˜¾ç¤ºè¿æ¥å’Œè®¤è¯ä¿¡æ¯
 	/**
 	 * @Function: private class ContrlReceiver extends BroadcastReceiver
 	 * @Description:
-	 *      ½ÓÊÜÀ´×ÔServiceµÄĞÅÏ¢£¬²¢ÇÒ×ª·¢¸øÏàÓ¦fragmentÀ´¸Ä±äÏàÓ¦×é¼şÄÚÈİ
+	 *      æ¥å—æ¥è‡ªServiceçš„ä¿¡æ¯ï¼Œå¹¶ä¸”è½¬å‘ç»™ç›¸åº”fragmentæ¥æ”¹å˜ç›¸åº”ç»„ä»¶å†…å®¹
 	 **/
 	private class ContrlReceiver extends BroadcastReceiver{
 
@@ -205,7 +204,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 			String typeString = intent.getStringExtra("type");
 			Message msgMessage = new Message();
 			Bundle bundle = new Bundle();
-			if(typeString.equals("temp"))/*·¢ËÍ¸øµÚÒ»¸öihome fragment*/
+			if(typeString.equals("temp"))/*å‘é€ç»™ç¬¬ä¸€ä¸ªihome fragment*/
 			{
 				bundle.putString("type", "temp");
 				String IDString = intent.getStringExtra("temp");
@@ -215,7 +214,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				communicationHandler.sendMessage(msgMessage);
 				
 			}
-			/*¸üĞÂÎÂ¶ÈĞÅÏ¢*/
+			/*æ›´æ–°æ¸©åº¦ä¿¡æ¯*/
 			else if(typeString.equals("humi"))
 			{
 				bundle.putString("type", "humi");
@@ -225,7 +224,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				msgMessage.setData(bundle);
 				communicationHandler.sendMessage(msgMessage);
 			}
-			/*µÆµÄ×´Ì¬*/
+			/*ç¯çš„çŠ¶æ€*/
 			else if(typeString.equals("ledon"))
 			{
 				bundle.putString("type", "ledon");
@@ -233,7 +232,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				msgMessage.setData(bundle);
 				communicationHandler.sendMessage(msgMessage);
 			}
-			/*µÆµÄ×´Ì¬*/
+			/*ç¯çš„çŠ¶æ€*/
 			else if(typeString.equals("ledoff"))
 			{
 				bundle.putString("type", "ledoff");
@@ -242,28 +241,37 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				msgMessage.setData(bundle);
 				communicationHandler.sendMessage(msgMessage);
 			}
-			/*ÏÔÊ¾Á¬½ÓºÍÈÏÖ¤Éí·İÇé¿ö*/
+			/*æ˜¾ç¤ºè¿æ¥å’Œè®¤è¯èº«ä»½æƒ…å†µ*/
 			else if(typeString.equals("disconnect"))
 			{
 				String stateString = intent.getStringExtra("disconnect");
 				if(stateString.equals("authing"))
 				{
-					Toast.makeText(ClientMainActivity.this, "ÕıÔÚÑéÖ¤ĞÅÏ¢...", Toast.LENGTH_SHORT).show();
+					Toast.makeText(ClientMainActivity.this, "æ­£åœ¨éªŒè¯ä¿¡æ¯...", Toast.LENGTH_SHORT).show();
 				}
 				else if(stateString.equals("connecting"))
 				{
-					Toast.makeText(ClientMainActivity.this, "ÕıÔÚÁ¬½Ó·şÎñÆ÷...", Toast.LENGTH_SHORT).show();
+					Toast.makeText(ClientMainActivity.this, "æ­£åœ¨è¿æ¥æœåŠ¡å™¨...", Toast.LENGTH_SHORT).show();
 				}
 				else if(stateString.equals("connected"))
 				{
-					Toast.makeText(ClientMainActivity.this, "Á¬½Ó³É¹¦", Toast.LENGTH_SHORT).show();
+					Toast.makeText(ClientMainActivity.this, "è¿æ¥æˆåŠŸ", Toast.LENGTH_SHORT).show();
 				}
 				else if(stateString.equals("authed"))
 				{
-					Toast.makeText(ClientMainActivity.this, "ÈÏÖ¤³É¹¦", Toast.LENGTH_SHORT).show();
+					Toast.makeText(ClientMainActivity.this, "è®¤è¯æˆåŠŸ", Toast.LENGTH_SHORT).show();
 				}
+				else if(stateString.equals("video connecting"))
+				{
+					Toast.makeText(ClientMainActivity.this, "æ­£åœ¨è¿æ¥è§†é¢‘æœåŠ¡å™¨...", Toast.LENGTH_SHORT).show();
+				}
+				else if(stateString.equals("video success"))
+				{
+					Toast.makeText(ClientMainActivity.this, "è§†é¢‘è¿æ¥æˆåŠŸ", Toast.LENGTH_SHORT).show();
+				}
+
 			}
-			/*·¢ËÍIHome mode¿ªÆô×´¿ö*/
+			/*å‘é€IHome modeå¼€å¯çŠ¶å†µ*/
 			else if(typeString.equals("ihome"))
 			{
 				bundle.putString("type", "ihome");
@@ -304,7 +312,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		*/
 	}
 
-	/** ´¦ÀíBottomControlPanelµÄ»Øµ÷
+	/** å¤„ç†BottomControlPanelçš„å›è°ƒ
 	 * @see org.yanzi.ui.BottomControlPanel.BottomPanelCallback#onBottomPanelClick(int)
 	 */
 	@Override
@@ -320,15 +328,15 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		}else if((itemId & Constant.BTN_FLAG_CSERVICE) != 0){
 			tag = Constant.FRAGMENT_FLAG_CSERVICE;
 		}
-		setTabSelection(tag); //ÇĞ»»Fragment
-		//headPanel.setMiddleTitle(tag);//ÇĞ»»±êÌâ 
+		setTabSelection(tag); //åˆ‡æ¢Fragment
+		//headPanel.setMiddleTitle(tag);//åˆ‡æ¢æ ‡é¢˜ 
 	}
 	
-	/**ÉèÖÃÑ¡ÖĞµÄTag
+	/**è®¾ç½®é€‰ä¸­çš„Tag
 	 * @param tag
 	 */
 	public  void setTabSelection(String tag) {
-		// ¿ªÆôÒ»¸öFragmentÊÂÎñ
+		// å¼€å¯ä¸€ä¸ªFragmentäº‹åŠ¡
 		fragmentTransaction = fragmentManager.beginTransaction();
 		if(TextUtils.equals(tag, Constant.FRAGMENT_FLAG_IHOME)){
 		   if (fragmentIHome == null) {
@@ -360,14 +368,14 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		 
 	}
 	
-	/**ÇĞ»»fragment 
+	/**åˆ‡æ¢fragment 
 	 * @param tag
 	 */
 	private  void switchFragment(String tag){
 		if(TextUtils.equals(tag, currFragTag)){
 			return;
 		}
-		//°ÑÉÏÒ»¸öfragment detachµô 
+		//æŠŠä¸Šä¸€ä¸ªfragment detachæ‰ 
 		if(currFragTag != null && !currFragTag.equals("")){
 			detachFragment(getFragment(currFragTag));
 		}
@@ -435,19 +443,19 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 	
 	/**
 	 *  @author: feather
-	 *  @description: ÅĞ¶ÏÊÇ·ñ°´ÏÂ·µ»Ø¼ü£¬Èç¹û°´ÏÂÔò½øĞĞÏàÓ¦´¦Àí
+	 *  @description: åˆ¤æ–­æ˜¯å¦æŒ‰ä¸‹è¿”å›é”®ï¼Œå¦‚æœæŒ‰ä¸‹åˆ™è¿›è¡Œç›¸åº”å¤„ç†
 	 **/
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
-		if(keyCode == KeyEvent.KEYCODE_BACK) //°´ÏÂ·µ»Ø¼ü
+		if(keyCode == KeyEvent.KEYCODE_BACK) //æŒ‰ä¸‹è¿”å›é”®
 		{
 			Intent intent = new Intent();
 			intent.putExtra("type", "ClientMainBack");
 			intent.setAction(intent.ACTION_MAIN);
 			this.sendBroadcast(intent);
 			
-			unregisterReceiver(contrlReceiver);//½â³ı×¢²áµÄReceiver
+			unregisterReceiver(contrlReceiver);//è§£é™¤æ³¨å†Œçš„Receiver
 			
 			boolean res =super.onKeyDown(keyCode, event);
 			//this.onDestory();

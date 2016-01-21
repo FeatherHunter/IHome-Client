@@ -25,15 +25,15 @@ import android.widget.Toast;
 
 
 /** 
- * @CopyRight: Íõ³½ºÆ 2015~2025
- * @Author Feather Hunter(ÁÔÓğ)
+ * @CopyRight: ç‹è¾°æµ© 2015~2025
+ * @Author Feather Hunter(çŒç¾½)
  * @qq:975559549
  * @Version:1.0 
  * @Date:2015/12/25
- * @Description: IHomeµÄFragment½çÃæ
+ * @Description: IHomeçš„Fragmentç•Œé¢
  * @Function List:
- *   1. void onAttach(Activity activity); //ÓÃÓÚ°ó¶¨ClientMainActivityºÍhandler
- *   2. Handler communicationHandler;     //ÓÃÓÚ´¦ÀíºÍClientMainActivityµÄÍ¨ĞÅ
+ *   1. void onAttach(Activity activity); //ç”¨äºç»‘å®šClientMainActivityå’Œhandler
+ *   2. Handler communicationHandler;     //ç”¨äºå¤„ç†å’ŒClientMainActivityçš„é€šä¿¡
  **/
 
 public class FragmentIHome extends BaseFragment{
@@ -57,14 +57,14 @@ public class FragmentIHome extends BaseFragment{
 	public void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		/*ÒªÔÚonCreateViewÖ®ºóµÃµ½¿Õ¼ä²ÅÊÇÓĞĞ§µÄ*/
+		/*è¦åœ¨onCreateViewä¹‹åå¾—åˆ°ç©ºé—´æ‰æ˜¯æœ‰æ•ˆçš„*/
 		temp_value = (TextView) getActivity().findViewById(R.id.temp_value);
 		humi_value = (TextView) getActivity().findViewById(R.id.humi_value);
 		led1_button = (Button) getActivity().findViewById(R.id.led1_button);
 		led2_button = (Button) getActivity().findViewById(R.id.led2_button);
 		led3_button = (Button) getActivity().findViewById(R.id.led3_button);
 		IHome_button = (Button) getActivity().findViewById(R.id.ihome_button);
-		/*ÉèÖÃ¼àÌıÆ÷*/
+		/*è®¾ç½®ç›‘å¬å™¨*/
   		led1_button.setOnClickListener(new LampButtonListener());
 		led2_button.setOnClickListener(new LampButtonListener());
 		led3_button.setOnClickListener(new LampButtonListener());
@@ -81,7 +81,7 @@ public class FragmentIHome extends BaseFragment{
 		mainActivity.setHandler(communicationHandler);
 	}
 	/**
-	 *  ´¦ÀíActivity´«µİÀ´µÄĞÅÏ¢
+	 *  å¤„ç†Activityä¼ é€’æ¥çš„ä¿¡æ¯
 	 */
 	public Handler communicationHandler = new Handler()
 	{
@@ -103,15 +103,15 @@ public class FragmentIHome extends BaseFragment{
 		    		ihome_mode = false;
 				}
 		    }
-		    else if(typeString.equals("temp"))/*ÉèÖÃÎÂ¶È*/
+		    else if(typeString.equals("temp"))/*è®¾ç½®æ¸©åº¦*/
 			{
-		    	String IDString = bundle.getString("temp");//»ñÈ¡Éè±¸ID
+		    	String IDString = bundle.getString("temp");//è·å–è®¾å¤‡ID
 		    	if(IDString.equals("10000"))
 		    	{
 		    		temp_value.setText(bundle.getString("10000"));
 		    	}
 			}
-		    else if(typeString.equals("humi"))/*ÉèÖÃÊª¶È*/
+		    else if(typeString.equals("humi"))/*è®¾ç½®æ¹¿åº¦*/
 			{
 		    	String IDString = bundle.getString("humi");
 		    	if(IDString.equals("10000"))
@@ -119,21 +119,21 @@ public class FragmentIHome extends BaseFragment{
 		    		humi_value.setText(bundle.getString("10000"));
 		    	}
 			}
-		    else if(typeString.equals("ledon"))/*ÉèÖÃµÆ*/
+		    else if(typeString.equals("ledon"))/*è®¾ç½®ç¯*/
 			{
 		    	if( bundle.getString("ledon").equals("0"))
 		    	{
-		    		led1_button.setText("¹ØÌ¨µÆ");
+		    		led1_button.setText("å…³å°ç¯");
 		    		led1_button.setTextColor(Color.RED);
 		    	}
 		    	else if( bundle.getString("ledon").equals("1"))
 		    	{
-		    		led2_button.setText("¹Ø±ÚµÆ");
+		    		led2_button.setText("å…³å£ç¯");
 		    		led2_button.setTextColor(Color.RED);
 		    	}
 		    	else if( bundle.getString("ledon").equals("2"))
 		    	{
-		    		led3_button.setText("¹ØµõµÆ");
+		    		led3_button.setText("å…³åŠç¯");
 		    		led3_button.setTextColor(Color.RED);
 		    	}
 			}
@@ -141,17 +141,17 @@ public class FragmentIHome extends BaseFragment{
 		    {
 		    	if( bundle.getString("ledoff").equals("0"))
 		    	{
-		    		led1_button.setText("¿ªÌ¨µÆ");
+		    		led1_button.setText("å¼€å°ç¯");
 		    		led1_button.setTextColor(0xff00cc00);
 		    	}
 		    	else if( bundle.getString("ledoff").equals("1"))
 		    	{
-		    		led2_button.setText("¿ª±ÚµÆ");
+		    		led2_button.setText("å¼€å£ç¯");
 		    		led2_button.setTextColor(0xff00cc00);
 		    	}
 		    	else if( bundle.getString("ledoff").equals("2"))
 		    	{
-		    		led3_button.setText("¿ªµõµÆ");
+		    		led3_button.setText("å¼€åŠç¯");
 		    		led3_button.setTextColor(0xff00cc00);
 		    	}
 		    }
@@ -173,7 +173,7 @@ public class FragmentIHome extends BaseFragment{
 				case R.id.led1_button:
 					{
 						IDString = new String("0");
-						if(led1_button.getText().equals("¿ªÌ¨µÆ"))
+						if(led1_button.getText().equals("å¼€å°ç¯"))
 						{
 							operator = Instruction.LAMP_ON;
 						}
@@ -188,7 +188,7 @@ public class FragmentIHome extends BaseFragment{
 					{
 						
 						IDString = new String("1");
-						if(led2_button.getText().equals("¿ª±ÚµÆ"))
+						if(led2_button.getText().equals("å¼€å£ç¯"))
 						{
 							operator = Instruction.LAMP_ON;
 						}
@@ -203,7 +203,7 @@ public class FragmentIHome extends BaseFragment{
 					{
 						
 						IDString = new String("2");
-						if(led3_button.getText().equals("¿ªµõµÆ"))
+						if(led3_button.getText().equals("å¼€åŠç¯"))
 						{
 							operator = Instruction.LAMP_ON;
 						}
@@ -217,7 +217,7 @@ public class FragmentIHome extends BaseFragment{
 			}//end of switch
 			
 			try {
-				/*ĞèÒª·¢ËÍµÄÖ¸Áî,byteÊı×é*/
+				/*éœ€è¦å‘é€çš„æŒ‡ä»¤,byteæ•°ç»„*/
 				byte typeBytes[] = {type,Instruction.COMMAND_SEPERATOR};
 				byte subtypeBytes[] = {Instruction.COMMAND_SEPERATOR,subtype, Instruction.COMMAND_SEPERATOR};
 				byte operatorBytes[] = {operator, Instruction.COMMAND_SEPERATOR};
@@ -226,7 +226,7 @@ public class FragmentIHome extends BaseFragment{
 				byte buffer[] = new byte[subtypeBytes.length+operatorBytes.length
 				                       +IDBytes.length+endBytes.length];
 				
-				/*×ª»»accountºóÃæËùÓĞÖ¸Áî*/
+				/*è½¬æ¢accountåé¢æ‰€æœ‰æŒ‡ä»¤*/
 				int start = 0;
 				System.arraycopy(subtypeBytes ,0,buffer,start, subtypeBytes.length);
 				start+=subtypeBytes.length;
@@ -236,7 +236,7 @@ public class FragmentIHome extends BaseFragment{
 				start+=IDBytes.length;
 				System.arraycopy(endBytes   ,0,buffer,start, endBytes.length);
 				
-				/*·¢ËÍ¹ã²¥¸øService£¬ÈÃÆä·¢ËÍĞÅÏ¢¸ø·şÎñÆ÷*/
+				/*å‘é€å¹¿æ’­ç»™Serviceï¼Œè®©å…¶å‘é€ä¿¡æ¯ç»™æœåŠ¡å™¨*/
 				Intent intent = new Intent();
 				intent.putExtra("type", "send");
 				intent.putExtra("onefield", typeBytes);
@@ -267,19 +267,19 @@ public class FragmentIHome extends BaseFragment{
 			{
 				operator = Instruction.IHome_STOP;
 			}
-			/*ĞèÒª·¢ËÍµÄÖ¸Áî,byteÊı×é*/
+			/*éœ€è¦å‘é€çš„æŒ‡ä»¤,byteæ•°ç»„*/
 			byte typeBytes[] = {Instruction.COMMAND_CONTRL,Instruction.COMMAND_SEPERATOR};
 			byte subtypeBytes[] = {Instruction.COMMAND_SEPERATOR,Instruction.CTL_IHome, Instruction.COMMAND_SEPERATOR};
 			byte operatorBytes[] = {operator, Instruction.COMMAND_SEPERATOR,Instruction.COMMAND_END};						
 			byte buffer[] = new byte[subtypeBytes.length+operatorBytes.length];
 			
-			/*×ª»»accountºóÃæËùÓĞÖ¸Áî*/
+			/*è½¬æ¢accountåé¢æ‰€æœ‰æŒ‡ä»¤*/
 			int start = 0;
 			System.arraycopy(subtypeBytes ,0,buffer,start, subtypeBytes.length);
 			start+=subtypeBytes.length;
 			System.arraycopy(operatorBytes ,0,buffer,start, operatorBytes.length);
 			
-			/*·¢ËÍ¹ã²¥¸øService£¬ÈÃÆä·¢ËÍĞÅÏ¢¸ø·şÎñÆ÷*/
+			/*å‘é€å¹¿æ’­ç»™Serviceï¼Œè®©å…¶å‘é€ä¿¡æ¯ç»™æœåŠ¡å™¨*/
 			Intent intent = new Intent();
 			intent.putExtra("type", "send");
 			intent.putExtra("onefield", typeBytes);

@@ -1,43 +1,43 @@
 package com.feather.activity;
 
 /** 
- * @CopyRight: Íõ³½ºÆ 2015~2025
- * @Author Feather Hunter(ÁÔÓğ)
- * @qq:975559549
- * @Version:1.1 
- * @Date:2016/1/10
- * @Description: IHome×ÔÖÆµÄÍ¨ĞÅĞ­Òé¡£°üº¬ÁËÆäÖĞËùÓĞÖ¸Áî¡£
+ * @CopyRight: ç‹è¾°æµ© 2015~2025
+ * @Author Feather Hunter(çŒç¾½)
+ * @qq: 975559549
+ * @Version: 1.1
+ * @Date: 2016/1/10
+ * @Description: IHomeè‡ªåˆ¶çš„é€šä¿¡åè®®ã€‚åŒ…å«äº†å…¶ä¸­æ‰€æœ‰æŒ‡ä»¤ã€‚
  **/
 
 public class Instruction {
 
-  //char COMMAND_PULSE  '0'
-    public static final byte COMMAND_MANAGE = 1;  //¹ÜÀíÖ¸Áî
-    public static final byte COMMAND_CONTRL = 2;  //¿ØÖÆÖ¸Áî
-    public static final byte COMMAND_RESULT = 3;  //½á¹ûÖ¸Áî
-    public static final byte COMMAND_VIDEO  = 4;  //ÊÓÆµÖ¸Áî
-    public static final byte MAN_LOGIN      = 11; //¹ÜÀí-µÇÂ¼
-    public static final byte CTL_LAMP       = 21; //¿ØÖÆ-µÆ
-    public static final byte CTL_GET        = 22; //¿ØÖÆ-»ñÈ¡
-    public static final byte CTL_IHome      = 23; //¿ØÖÆ-IHome
-    public static final byte CTL_VIDEO      = 24; //¿ØÖÆ-ÊÓÆµ
-    public static final byte RES_LOGIN      = 32; //½á¹û-µÇÂ¼
-    public static final byte RES_LAMP       = 33; //½á¹û-µÆ
-    public static final byte RES_TEMP       = 34; //½á¹û-ÎÂ¶È
-    public static final byte RES_HUMI       = 35; //½á¹û-Êª¶È
-    public static final byte RES_IHome      = 36; //½á¹û-IHome
-    public static final byte RES_VIDEO      = 37; //½á¹û-ÊÓÆµ
-    public static final byte VIDEO_START    = 41; //ÊÓÆµ-¿ªÆô
-    public static final byte VIDEO_STOP     = 42; //ÊÓÆµ-¹Ø±Õ
-    public static final byte LOGIN_SUCCESS  = 1;  //µÇÂ¼³É¹¦
-    public static final byte LOGIN_FAILED   = 2;  //µÇÂ¼Ê§°Ü
-    public static final byte LAMP_ON        = 1;  //µÆ¿ªÆô
-    public static final byte LAMP_OFF       = 2;  //µÆ¹Ø±Õ
-    public static final byte IHome_START    = 1;  //IHomeÄ£Ê½¿ªÆô
-    public static final byte IHome_STOP     = 2;  //IHomeÄ£Ê½¹Ø±Õ
-    public static final byte VIDEO_OK       = 1;  //ÊÓÆµOK
-    public static final byte VIDEO_ERROR    = 2;  //ÊÓÆµ´íÎó
+    public static final byte COMMAND_PULSE  ='0'; //å¿ƒè·³æŒ‡ä»¤
+    public static final byte COMMAND_MANAGE = 1;  //ç®¡ç†æŒ‡ä»¤
+    public static final byte COMMAND_CONTRL = 2;  //æ§åˆ¶æŒ‡ä»¤
+    public static final byte COMMAND_RESULT = 3;  //ç»“æœæŒ‡ä»¤
+    public static final byte COMMAND_VIDEO  = 4;  //è§†é¢‘æŒ‡ä»¤
+    public static final byte MAN_LOGIN      = 11; //ç®¡ç†-ç™»å½•
+    public static final byte CTL_LAMP       = 21; //æ§åˆ¶-ç¯
+    public static final byte CTL_GET        = 22; //æ§åˆ¶-è·å–
+    public static final byte CTL_IHome      = 23; //æ§åˆ¶-IHome
+    public static final byte CTL_VIDEO      = 24; //æ§åˆ¶-è§†é¢‘
+    public static final byte RES_LOGIN      = 32; //ç»“æœ-ç™»å½•
+    public static final byte RES_LAMP       = 33; //ç»“æœ-ç¯
+    public static final byte RES_TEMP       = 34; //ç»“æœ-æ¸©åº¦
+    public static final byte RES_HUMI       = 35; //ç»“æœ-æ¹¿åº¦
+    public static final byte RES_IHome      = 36; //ç»“æœ-IHome
+    public static final byte RES_VIDEO      = 37; //ç»“æœ-è§†é¢‘
+    public static final byte VIDEO_START    = 41; //è§†é¢‘-å¼€å¯
+    public static final byte VIDEO_STOP     = 42; //è§†é¢‘-å…³é—­
+    public static final byte LOGIN_SUCCESS  = 1;  //ç™»å½•æˆåŠŸ
+    public static final byte LOGIN_FAILED   = 2;  //ç™»å½•å¤±è´¥
+    public static final byte LAMP_ON        = 1;  //ç¯å¼€å¯
+    public static final byte LAMP_OFF       = 2;  //ç¯å…³é—­
+    public static final byte IHome_START    = 1;  //IHomeæ¨¡å¼å¼€å¯
+    public static final byte IHome_STOP     = 2;  //IHomeæ¨¡å¼å…³é—­
+    public static final byte VIDEO_OK       = 1;  //è§†é¢‘OK
+    public static final byte VIDEO_ERROR    = 2;  //è§†é¢‘é”™è¯¯
     
-    public static final byte COMMAND_SEPERATOR = 31;//31µ¥Ôª·Ö¸ô·û
-    public static final byte COMMAND_END    = 30; //30,Ò»¸öÖ¸Áî½áÊø
+    public static final byte COMMAND_SEPERATOR = 31;//31å•å…ƒåˆ†éš”ç¬¦
+    public static final byte COMMAND_END    = 30; //30,ä¸€ä¸ªæŒ‡ä»¤ç»“æŸ
 }
