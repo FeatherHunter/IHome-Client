@@ -95,7 +95,8 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 	private ContrlReceiver contrlReceiver;
 	private String CONTRL_ACTION = "android.intent.action.EDIT";
 	
-	public Handler communicationHandler;
+	public Handler ihomeHandler;
+	public Handler videoHandler;
 /*	private MessageFragment messageFragment;
 	private ContactsFragment contactsFragment;
 	private NewsFragment newsFragment;
@@ -182,11 +183,17 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 		System.out.println("onPause");
 	}
 
-	/*设置*/
-	public void setHandler(Handler handler)
+	/*设置IHomeHandler用于和IHomeFragment通信*/
+	public void setIHomeHandler(Handler handler)
 	{
-		communicationHandler = handler;
+		ihomeHandler = handler;
 	}
+	/*设置videoHandler用于和VideoFragment通信*/
+	public void setVideoHandler(Handler handler)
+	{
+		videoHandler = handler;
+	}
+
 	//接收器,更新温度等数据信息,显示连接和认证信息
 	/**
 	 * @Function: private class ContrlReceiver extends BroadcastReceiver
@@ -211,7 +218,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				bundle.putString("temp", IDString);
 				bundle.putString(IDString, intent.getStringExtra(IDString));
 				msgMessage.setData(bundle);
-				communicationHandler.sendMessage(msgMessage);
+				ihomeHandler.sendMessage(msgMessage);
 				
 			}
 			/*更新温度信息*/
@@ -222,7 +229,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				bundle.putString("humi", IDString);
 				bundle.putString(IDString, intent.getStringExtra(IDString));
 				msgMessage.setData(bundle);
-				communicationHandler.sendMessage(msgMessage);
+				ihomeHandler.sendMessage(msgMessage);
 			}
 			/*灯的状态*/
 			else if(typeString.equals("ledon"))
@@ -230,7 +237,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				bundle.putString("type", "ledon");
 				bundle.putString("ledon", intent.getStringExtra("ledon"));
 				msgMessage.setData(bundle);
-				communicationHandler.sendMessage(msgMessage);
+				ihomeHandler.sendMessage(msgMessage);
 			}
 			/*灯的状态*/
 			else if(typeString.equals("ledoff"))
@@ -239,7 +246,7 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				String ledString = intent.getStringExtra("ledoff");
 				bundle.putString("ledoff", ledString);
 				msgMessage.setData(bundle);
-				communicationHandler.sendMessage(msgMessage);
+				ihomeHandler.sendMessage(msgMessage);
 			}
 			/*显示连接和认证身份情况*/
 			else if(typeString.equals("disconnect"))
@@ -278,13 +285,16 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 				String modeString = intent.getStringExtra("ihome");
 				bundle.putString("ihome", modeString);
 				msgMessage.setData(bundle);
-				communicationHandler.sendMessage(msgMessage);
+				ihomeHandler.sendMessage(msgMessage);
 				Toast.makeText(ClientMainActivity.this, modeString, Toast.LENGTH_SHORT).show();
 			}
 			else if(typeString.equals("video"))
 			{
-				String IDString = intent.getStringExtra("video");
-				Toast.makeText(ClientMainActivity.this, IDString, Toast.LENGTH_SHORT).show();
+				bundle.putString("type", "video");
+				String operationString = intent.getStringExtra("video");
+				bundle.putString("video", operationString);
+				msgMessage.setData(bundle);
+				videoHandler.sendMessage(msgMessage);
 			}
 
 		}
@@ -313,7 +323,6 @@ public class ClientMainActivity extends Activity implements BottomPanelCallback 
 	}
 
 	/** 处理BottomControlPanel的回调
-	 * @see org.yanzi.ui.BottomControlPanel.BottomPanelCallback#onBottomPanelClick(int)
 	 */
 	@Override
 	public void onBottomPanelClick(int itemId) {

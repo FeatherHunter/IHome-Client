@@ -80,7 +80,7 @@ public class IHomeService extends Service{
 	private String SERVICE_ACTION = "android.intent.action.MAIN";
 	
 	private String serverString = "139.129.19.115";
-	private String contrlCenterString = "192.168.1.108";
+	private String contrlCenterString = "192.168.1.107";
 	private int generalPort = 8080;
 	private int videoPort   = 9080;
 	private String cameraIDString = "20000";
@@ -150,6 +150,7 @@ public class IHomeService extends Service{
 			/*停止所有线程*/
 			else if(commandString.equals("stop"))
 			{
+				System.out.println("stopallthread");
 				stopallthread = true;
 			}
 			
@@ -207,6 +208,10 @@ public class IHomeService extends Service{
 						e.printStackTrace();
 					}
 				}
+				if(stopallthread)
+				{
+					break;
+				}
 				if(accountReady && (isConnected == false))//身份确定并且没有连接
 				{
 					/*正在重新连接*/
@@ -262,6 +267,10 @@ public class IHomeService extends Service{
 						}
 					}//end of connecting stm32 by wifi
 					isTestWifi = false;
+					if(stopallthread)
+					{
+						break;
+					}
 					if(iswified == true)
 					{
 						/*断开连接后,重新连接和身份认证*/
@@ -337,6 +346,10 @@ public class IHomeService extends Service{
 						}	
 						
 					}//end of connecting server
+				}
+				if(stopallthread)
+				{
+					break;
 				}
 				/*在连接成功和用户身份确定的时候，进行身份认证*/
 				if(isConnected && accountReady && (isAuthed == false))
@@ -573,6 +586,10 @@ public class IHomeService extends Service{
 						e.printStackTrace();
 					}
 				}
+				if(stopallthread)
+				{
+					break;
+				}
 				try {
 
 					System.out.println("rev msg runnable is runnnnnnnnnnnnnnnnnnning");
@@ -675,105 +692,99 @@ public class IHomeService extends Service{
 						}
 						//System.out.println("account check success");
 					   /*-------------------先处理视频指令------------------------*/
-						if(type == Instruction.COMMAND_VIDEO)
-						{
-							System.out.println("COMMAND_VIDEO magstart :  " + msgStart + "  i: " + i);
+						synchronized (Instruction.class){ //视频处理要上锁
+							if(type == Instruction.COMMAND_VIDEO)
+							{
+								System.out.println("COMMAND_VIDEO magstart :  " + msgStart + "  i: " + i);
 							/*获得摄像头ID*/
-							for(start = i, end = start; (end<bufferEnd)&&((handleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
-							{
-								;
-							}
-							i++;
-							cameraIDString = new String(handleBuffer, start, end - start); //end - start 重点注意！
-							if(cameraIDString.equals(cameraIDString))//确定为需要的视频ID：20000
-							{
-								if((i + 1 < bufferEnd)&&(handleBuffer[i+1]==Instruction.COMMAND_SEPERATOR))
+								for(start = i, end = start; (end<bufferEnd)&&((handleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
 								{
-									subtype = handleBuffer[i];
-									if(subtype == Instruction.VIDEO_START)//视频流开始
+									;
+								}
+								i++;
+								cameraIDString = new String(handleBuffer, start, end - start); //end - start 重点注意！
+								if(cameraIDString.equals(cameraIDString))//确定为需要的视频ID：20000
+								{
+									if((i + 1 < bufferEnd)&&(handleBuffer[i+1]==Instruction.COMMAND_SEPERATOR))
 									{
-										//System.out.println("video start");
-										i += 3;
-										try {
-											jpegOutputStream = new FileOutputStream("mnt/sdcard/camera.jpg");
-										} catch (Exception e) {
-											// TODO: handle exception
-											e.printStackTrace();
-										}
-//									Intent intent = new Intent();
-//									intent.setAction(intent.ACTION_EDIT);
-//									/*返回ihome模式开启情况*/
-//									intent.putExtra("type", "video");
-//									intent.putExtra("video", "video start");
-//									sendBroadcast(intent);
-										msgStart = i;
-
-									}//end of video_start
-									else if(subtype == Instruction.VIDEO_STOP)//数据流结束
-									{
-										//System.out.println("video stop");
-										i += 3;
-
-//									Intent intent = new Intent();
-//									intent.setAction(intent.ACTION_EDIT);
-//									/*返回ihome模式开启情况*/
-//									intent.putExtra("type", "video");
-//									intent.putExtra("video", "video stop");
-//									sendBroadcast(intent);
-
-										if(jpegOutputStream != null)
+										subtype = handleBuffer[i];
+										if(subtype == Instruction.VIDEO_START)//视频流开始
 										{
+											//System.out.println("video start");
+											i += 3;
 											try {
-												jpegOutputStream.close();//关闭输出流
+												jpegOutputStream = new FileOutputStream("mnt/sdcard/camera.jpg");
 											} catch (Exception e) {
 												// TODO: handle exception
 												e.printStackTrace();
 											}
-										}
-										msgStart = i;
-									}//end of video stop
-								}
-								else {
-									//System.out.println("video data====================================");
-									/*获得数据长度*/
-									for(start = i, end = start; (end<bufferEnd)&&((handleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
-									{
-										;
-									}
-									i++;
-									dataLengthString = new String(handleBuffer, start, end - start);
-									/*数据长度*/
-									dataLength = Integer.valueOf(dataLengthString);
-									//说明为数据
+											msgStart = i;
 
-									if(i + dataLength <= bufferEnd)//收到所有的数据
-									{
-										try {
-											jpegOutputStream.write(handleBuffer, i, dataLength);
+										}//end of video_start
+										else if(subtype == Instruction.VIDEO_STOP)//数据流结束
+										{
+											//System.out.println("video stop");
+											i += 3;
+
+											if(jpegOutputStream != null)
+											{
+												try {
+													jpegOutputStream.close();//关闭输出流
+												} catch (Exception e) {
+													// TODO: handle exception
+													e.printStackTrace();
+												}
+												Intent intent = new Intent();
+												intent.setAction(intent.ACTION_EDIT);
+												intent.putExtra("type", "video");
+												intent.putExtra("video","finish");
+												sendBroadcast(intent);
+											}
+											msgStart = i;
+										}//end of video stop
+									}
+									else {
+										//System.out.println("video data====================================");
+									/*获得数据长度*/
+										for(start = i, end = start; (end<bufferEnd)&&((handleBuffer[end] !=Instruction.COMMAND_SEPERATOR)) ; i++,end++)
+										{
+											;
+										}
+										i++;
+										dataLengthString = new String(handleBuffer, start, end - start);
+									/*数据长度*/
+										dataLength = Integer.valueOf(dataLengthString);
+										//说明为数据
+
+										if(i + dataLength <= bufferEnd)//收到所有的数据
+										{
+											try {
+												jpegOutputStream.write(handleBuffer, i, dataLength);
 //											Intent intent = new Intent();
 //											intent.setAction(intent.ACTION_EDIT);
 //											intent.putExtra("type", "video");
 //											intent.putExtra("video", dataLength+" ");
 //											sendBroadcast(intent);
-										} catch (Exception e) {
-											// TODO: handle exception
-											e.printStackTrace();
+											} catch (Exception e) {
+												// TODO: handle exception
+												e.printStackTrace();
+											}
 										}
-									}
-									else {//没有受到所有数据
-										System.out.println("没有接收到正常长度的数据");
-										i = bufferEnd; //直接跳转到结尾结束处理
-										continue; //等待接收好下一个指令再作打算
-									}
-									i += dataLength;
-									//System.out.println("datalength: "+ dataLength + " i :" + i);
-									msgStart = i; //正常完成处理
-								}//end of 是数据
-								continue;
+										else {//没有受到所有数据
+											System.out.println("没有接收到正常长度的数据");
+											i = bufferEnd; //直接跳转到结尾结束处理
+											continue; //等待接收好下一个指令再作打算
+										}
+										i += dataLength;
+										//System.out.println("datalength: "+ dataLength + " i :" + i);
+										msgStart = i; //正常完成处理
+									}//end of 是数据
+									continue;
 
-							}//end of camera id
+								}//end of camera id
 
-						}//end of 视频指令
+							}//end of 视频指令
+						}
 						if(type == Instruction.COMMAND_RESULT)
 						{
 							type = 0; //清空type
@@ -812,7 +823,7 @@ public class IHomeService extends Service{
 								intent.setAction(intent.ACTION_EDIT);
 								if(subtype == Instruction.IHome_START)
 								{
-										/*返回ihome模式开启情况*/
+									/*返回ihome模式开启情况*/
 									intent.putExtra("type", "ihome");
 									intent.putExtra("ihome", "start");
 									sendBroadcast(intent);

@@ -78,12 +78,12 @@ public class FragmentIHome extends BaseFragment{
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
 		mainActivity = (ClientMainActivity) activity;
-		mainActivity.setHandler(communicationHandler);
+		mainActivity.setIHomeHandler(ihomeHandler);
 	}
 	/**
 	 *  处理Activity传递来的信息
 	 */
-	public Handler communicationHandler = new Handler()
+	public Handler ihomeHandler = new Handler()
 	{
 		public void handleMessage(Message msg) {
 			// TODO Auto-generated method stub

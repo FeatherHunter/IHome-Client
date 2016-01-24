@@ -183,18 +183,22 @@ public class ClientActivity extends Activity {
 					public void run() {
 						// TODO Auto-generated method stub
 						Toast.makeText(ClientActivity.this, "登陆超时", Toast.LENGTH_SHORT).show();
-						
-			    		serviceIntent = new Intent();
-			    		serviceIntent.putExtra("command", "stop");
-			    		serviceIntent.setClass(ClientActivity.this, IHomeService.class);
-			    		startService(serviceIntent); //发送停止指令
-			    		stopService(serviceIntent);  //关闭后台连接服务
+						stopService();
 					}
 				});
 			}
 			
 		}
 	};
+
+	private void stopService()
+	{
+		serviceIntent = new Intent();
+		serviceIntent.putExtra("command", "stop");
+		serviceIntent.setClass(ClientActivity.this, IHomeService.class);
+		startService(serviceIntent); //发送停止指令
+		stopService(serviceIntent);  //关闭后台连接服务
+	}
 	
 	/**
 	 *  @Class: AuthReceiver
@@ -271,6 +275,7 @@ public class ClientActivity extends Activity {
 					/*要开始重新登录*/
 					System.out.println("relogin");
 					firstSwitch = true;
+					stopService();//结束服务
 				}
 		}
 	}
